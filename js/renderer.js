@@ -9,6 +9,23 @@ document.addEventListener('DOMContentLoaded', () => {
     let win = remote.getGlobal('win');
     let winLoading = remote.getGlobal('winLoading');
 
+    // Node functionality
+    function Node(title, content) {
+        this.title = title;
+        this.content = content;
+    }
+
+    let nodesExample = [
+        new Node("Epic example node", "This sample node right here is super freaking epic. Honestly, I don't know if any other example node can beat THIS example node."),
+        new Node("Even epic-cer node", "WOW. I can't believe it!!! This example node is even epicer than the previous one. Hence the name.")
+    ];
+
+    let DOMeditorNodeContainer = document.querySelector("#editor-node-container");
+    nodesExample.forEach((nodeObj) => {
+        // TODO: Create nodes for example
+    });
+    
+
     // Window buttons
     let DOMwinBtnContainer = document.querySelector("#windowButtons");
     DOMwinBtnContainer.addEventListener('click', (e) => {

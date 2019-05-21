@@ -48,6 +48,44 @@ body {
     color: #7C7C7C;
 }
 
+.navSystem {
+    position: absolute;
+    top: 0;
+    left: 30px;
+    box-sizing: border-box;
+    background-color: #7C7C7C;
+    color: #ECECEC;
+    z-index: 110;
+    height: 25px;
+}
+
+.navSystem ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+}
+
+.navSystem .navBtn {
+    background: none;
+    border: none;
+    color: #F9F9F9;
+    font-family: Calibri, sans-serif;
+    height: 25px;
+    padding: 0 15px;
+    outline: none !important;
+    -webkit-app-region: no-drag;
+}
+
+.navSystem .navBtn:hover {
+    box-shadow: 0 0 3px 0 inset rgba(0, 0, 0, 0.125);
+}
+
+.navSystem .navBtn:active {
+    box-shadow: 0 0 6px 0 inset rgba(0, 0, 0, 0.25);
+}
+
 main {
     width: 100vw;
     height: 100vh;
