@@ -28,9 +28,18 @@ document.addEventListener('DOMContentLoaded', () => {
     DOMeditorPage.addEventListener('mousedown', (e) => {
         e = e || window.event;
 
-        isEditorPageHeld = true;
+        if(e.target === DOMeditorPage) {
+            isEditorPageHeld = true;
 
-        editorPageHeldPos = [ e.clientX, e.clientY ];
+            editorPageHeldPos = [ e.clientX, e.clientY ];
+        }
+    });
+
+    // Editor page -- "To Start" button
+    let DOMeditorToStart = document.querySelector("#editor-to-start");
+    DOMeditorToStart.addEventListener('click', () => {
+        editorPos = [0, 0];
+        DOMeditorPage.style.backgroundPosition = "0 0";
     });
 
     // Window event -- Move mouse around
