@@ -45,10 +45,11 @@ var createMainWindow = () => {
             nodeIntegration: true
         },
         autoHideMenuBar: true,
-        icon: __dirname + '/assets/icon.ico',
-        show: false
+        icon: __dirname + '/assets/icons/icon.ico',
+        show: false,
+        frame: false
     });
-    
+
     // Load index.html
     win.loadFile('./index.html');
     

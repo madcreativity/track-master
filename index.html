@@ -8,12 +8,26 @@
         <title>TrackMaster</title>
     </head>
     <body>
+        <header id="windowFrame">
+            <img src="./assets/images/icon.png" id="windowIcon">
+
+            <div id="windowButtons">
+                <button class="windowBtn" id="windowMinimizeBtn">_</button>
+                <button class="windowBtn" id="windowCloseBtn">X</button>
+            </div>
+        </header>
         <main>
-            <!-- Index Open -->
-            <article class="page-body" id="page-index">
+            <!-- Initial Open -->
+            <article class="page-body hidden" id="page-initial">
+
+            </article>
+            <!-- Initial Close -->
+
+            <!-- Editor Open -->
+            <article class="page-body visible" id="page-editor" style="background-position: 0 0;">
                 
             </article>
-            <!-- Index Close -->
+            <!-- Editor Close -->
         </main>
 
         <script src="./js/renderer.js"></script>
