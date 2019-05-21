@@ -44,20 +44,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
         } else if(e.target.className.indexOf("subNavOuterBtn") !== -1) {
-            // Hide visible subnavigations
-            let visibleItems = DOMnavSystem.querySelectorAll(".subNav.visible");
-            visibleItems.forEach(visibleItem => {
-                visibleItem.replace("visible", "hidden");
-            });
+            let visibleItems = Array.prototype.slice.call(DOMnavSystem.querySelectorAll(".subNav.visible"));
             
             // Buttons to open subnavigations
             let thisParent = e.target.parentNode.querySelector(".subNav");
-
+            
             if(thisParent.className.indexOf("hidden") !== -1) {
                 thisParent.className = thisParent.className.replace("hidden", "visible");
-            } else if(thisParent.className.indexOf("visible") !== -1) {
-                thisParent.className = thisParent.className.replace("visible", "hidden");
-            }            
+            }
+            
+            // Hide visible subnavigations
+            if(visibleItems.indexOf(e.target) !== -1) {
+                visibleItems.splice(visibleItems.indexOf(e.target), 1);
+            }
+
+            for(let i = 0; i < visibleItems.length; i++) {
+                visibleItems[i].className = visibleItems[i].className.replace("visible", "hidden");
+            }
+            
+
         }
     });
 
