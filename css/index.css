@@ -1,6 +1,5 @@
 body {
     margin: 0;
-    background-color: #ECECEC;
     color: #7C7C7C;
     font-family: Calibri, sans-serif;
     font-size: 14px;
@@ -65,8 +64,14 @@ main {
     height: 100%;
 }
 
+/* Initial page */
+#page-initial {
+    background-color: #F9F9F9;
+}
+
 /* Editor page */
 #page-editor {
+    background-color: #ECECEC;
     background-image: url("../assets/images/grid-back.png");
 }
 
