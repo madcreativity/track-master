@@ -36,6 +36,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Navigation bar
+    DOMnavSystem = document.querySelector(".navSystem");
+    DOMnavSystem.addEventListener('click', (e) => {
+        if(e.target.id === "navBtn-about") {
+            // About button
+
+
+        } else if(e.target.className.indexOf("subNavOuterBtn") !== -1) {
+            // Hide visible subnavigations
+            let visibleItems = DOMnavSystem.querySelectorAll(".subNav.visible");
+            visibleItems.forEach(visibleItem => {
+                visibleItem.replace("visible", "hidden");
+            });
+            
+            // Buttons to open subnavigations
+            let thisParent = e.target.parentNode.querySelector(".subNav");
+
+            if(thisParent.className.indexOf("hidden") !== -1) {
+                thisParent.className = thisParent.className.replace("hidden", "visible");
+            } else if(thisParent.className.indexOf("visible") !== -1) {
+                thisParent.className = thisParent.className.replace("visible", "hidden");
+            }            
+        }
+    });
+
+
     // Draggable editor page
     let DOMeditorPage = document.querySelector("#page-editor");
     let isEditorPageHeld = false;

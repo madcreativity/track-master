@@ -5,7 +5,7 @@
 
         <link rel="stylesheet" href="./css/index.css">
 
-        <title>TrackMaster</title>
+        <title>Tracks</title>
     </head>
     <body>
         <header id="windowFrame">
@@ -13,7 +13,14 @@
 
             <nav class="navSystem">
                 <ul>
-                    <li><button class="navBtn" id="navBtn-file">File</button></li>
+                    <li>
+                        <button class="navBtn subNavOuterBtn" id="navBtn-file">File</button>
+                        <ul class="subNav hidden">
+                            <li><button class="subNavBtn" id="subNav-file-newFile">New File</button></li>
+                            <li><button class="subNavBtn" id="subNav-file-openFile">Open File</button></li>
+                            <li><button class="subNavBtn" id="subNav-file-saveAs">Save As</button></li>
+                        </ul>
+                    </li>
                     <li><button class="navBtn" id="navBtn-about">About</button></li>
                 </ul>
             </nav>

@@ -59,7 +59,7 @@ body {
     height: 25px;
 }
 
-.navSystem ul {
+.navSystem > ul {
     margin: 0;
     padding: 0;
     list-style: none;
@@ -83,6 +83,39 @@ body {
 }
 
 .navSystem .navBtn:active {
+    box-shadow: 0 0 6px 0 inset rgba(0, 0, 0, 0.25);
+}
+
+.subNav {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 100%;
+    background-color: #7C7C7C;
+    margin: 0;
+    list-style: none;
+    width: 200px;
+    box-sizing: border-box;
+    padding: 0;
+}
+
+.subNav .subNavBtn {
+    border: none;
+    background: none;
+    color: #F9F9F9;
+    width: 100%;
+    text-align: left;
+    padding: 5px 15px;
+    font-family: Calibri, sans-serif;
+    -webkit-app-region: no-drag;
+    outline: none !important;
+}
+
+.subNav .subNavBtn:hover {
+    box-shadow: 0 0 3px 0 inset rgba(0, 0, 0, 0.125);
+}
+
+.subNav .subNavBtn:active {
     box-shadow: 0 0 6px 0 inset rgba(0, 0, 0, 0.25);
 }
 

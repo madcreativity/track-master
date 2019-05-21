@@ -14,6 +14,7 @@ var createLoadingWindow = () => {
             nodeIntegration: true
         },
         autoHideMenuBar: true,
+        icon: __dirname + '/assets/icons/icon.ico',
         frame: false
     });
 
