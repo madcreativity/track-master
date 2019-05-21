@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let DOMeditorPage = document.querySelector("#page-editor");
     let isEditorPageHeld = false;
     let editorPageHeldPos = [0, 0];
+    let editorPos = [0, 0];
 
     DOMeditorPage.addEventListener('mousedown', (e) => {
         e = e || window.event;
@@ -32,22 +33,32 @@ document.addEventListener('DOMContentLoaded', () => {
         editorPageHeldPos = [ e.clientX, e.clientY ];
     });
 
-    DOMeditorPage.addEventListener('mousemove', (e) => {
+    // Window event -- Move mouse around
+    window.addEventListener('mousemove', (e) => {
         e = e || window.event;
 
-        
+        // Draggable background - Move if left mouse button is held down
         if(isEditorPageHeld) {
             let relativeX, relativeY;
-            
-            relativeX = e.clientX - editorPageHeldPos[0];
-            relativeY = e.clientY - editorPageHeldPos[1];
+
+            relativeX = e.clientX - editorPageHeldPos[0] + editorPos[0];
+            relativeY = e.clientY - editorPageHeldPos[1] + editorPos[1];
 
             DOMeditorPage.style.backgroundPosition = relativeX + "px " + relativeY + "px";
         }
     });
 
-    DOMeditorPage.addEventListener('mouseup', () => {
-        isEditorPageHeld = false;
+    // Window event -- Let go of left mouse button
+    window.addEventListener('mouseup', (e) => {
+        e = e || window.event;
+
+        // Draggable background
+        if(isEditorPageHeld) {
+            isEditorPageHeld = false;
+
+            editorPos[0] = e.clientX - editorPageHeldPos[0] + editorPos[0];
+            editorPos[1] = e.clientY - editorPageHeldPos[1] + editorPos[1];
+        }
     });
 
     // Loading completed
