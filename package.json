@@ -7,6 +7,7 @@
     "start": "electron ."
   },
   "devDependencies": {
+    "bezier-js": "^2.4.0",
     "electron": "^5.0.1"
   },
   "dependencies": {

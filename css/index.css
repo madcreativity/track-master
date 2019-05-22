@@ -186,6 +186,7 @@ main {
 
 #page-editor #editor-node-container {
     position: absolute;
+    z-index: 20
 }
 
 #page-editor .nodeContainer {
@@ -213,4 +214,11 @@ main {
 #page-editor .nodeContent {
     margin: 10px 5px;
     color: #7C7C7C;
+}
+
+#page-editor #editor-node-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
 }

@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const app = remote.app;
     const {ipcRenderer} = require('electron');
     const fs = require('fs');
+    const bezier = require('bezier-js');
 
     // Connect windows
     let win = remote.getGlobal('win');
@@ -12,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Node functionality
     let nodeAmount = 0;
 
-    function NodeItem(title, content, connections, transform) {
+    function Node(title, content, connections, transform) {
         this.id = nodeAmount;
         this.title = title;
         this.content = content;
@@ -23,10 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     let nodesExample = [
-        new NodeItem("Epic example node", "This sample node right here is super freaking epic. Honestly, I don't know if any other example node can beat THIS example node.", [1], [-50, 20, 400]),
-        new NodeItem("Even epic-cer node", "WOW. I can't believe it!!! This example node is even more the epic-cer than the previous one. Hence the name.", [], [250, 400, 600])
+        new Node("Epic example node", "This sample node right here is super freaking epic. Honestly, I don't know if any other example node can beat THIS example node.", [1], [-50, 20, 400]),
+        new Node("Even epic-cer node", "WOW. I can't believe it!!! This example node is even more the epic-cer than the previous one. Hence the name.", [], [250, 400, 600])
     ];
 
+    // Create nodes
     let DOMeditorNodeContainer = document.querySelector("#editor-node-container");
     nodesExample.forEach((nodeObj) => {
         // Create elements
@@ -54,7 +56,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         DOMeditorNodeContainer.appendChild(nodeContainerElement);
     });
-    
+
+    // Force node canvas to fill entire screen
+    let DOMnodeCanvas = document.querySelector("#editor-node-canvas");
+    DOMnodeCanvas.width = window.innerWidth;
+    DOMnodeCanvas.height = window.innerHeight;
+
+    window.addEventListener('resize', (e) => {
+        DOMnodeCanvas.width = window.innerWidth;
+        DOMnodeCanvas.height = window.innerHeight;
+    });
 
     // Window buttons
     let DOMwinBtnContainer = document.querySelector("#windowButtons");
