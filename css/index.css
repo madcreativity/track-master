@@ -4,6 +4,7 @@ body {
     font-family: Calibri, sans-serif;
     font-size: 14px;
     font-weight: 400;
+    overflow: hidden;
 }
 
 #windowFrame {
@@ -53,7 +54,6 @@ body {
     top: 0;
     left: 30px;
     box-sizing: border-box;
-    background-color: #7C7C7C;
     color: #ECECEC;
     z-index: 110;
     height: 25px;
@@ -97,6 +97,7 @@ body {
     width: 200px;
     box-sizing: border-box;
     padding: 0;
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.25);
 }
 
 .subNav .subNavBtn {
@@ -119,11 +120,20 @@ body {
     box-shadow: 0 0 6px 0 inset rgba(0, 0, 0, 0.25);
 }
 
+#winTitle {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    color: #BCBCBC;
+    line-height: 25px;
+}
+
 main {
     width: 100vw;
     height: 100vh;
     box-sizing: border-box;
-    overflow: hidden;
 }
 
 .hidden {
@@ -172,4 +182,35 @@ main {
 
 #page-editor #editor-to-start p {
     margin: 0;
+}
+
+#page-editor #editor-node-container {
+    position: absolute;
+}
+
+#page-editor .nodeContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #F9F9F9;
+    padding: 10px 20px;
+    box-sizing: border-box;
+    border-radius: 11px;
+    border: 1px solid #7C7C7C;
+    box-shadow: 2px 2px 6px 0 rgba(0, 0, 0, 0.2);
+    -webkit-app-region: no-drag;
+    -webkit-user-select: none;
+}
+
+#page-editor .nodeTitle {
+    margin: 5px 0;
+    border-bottom: 1px solid #7C7C7C;
+    color: #7C7C7C;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+#page-editor .nodeContent {
+    margin: 10px 5px;
+    color: #7C7C7C;
 }

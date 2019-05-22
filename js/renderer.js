@@ -10,19 +10,49 @@ document.addEventListener('DOMContentLoaded', () => {
     let winLoading = remote.getGlobal('winLoading');
 
     // Node functionality
-    function Node(title, content) {
+    let nodeAmount = 0;
+
+    function NodeItem(title, content, connections, transform) {
+        this.id = nodeAmount;
         this.title = title;
         this.content = content;
+        this.connections = connections; // Array of ID's
+        this.transform = transform; // [Xpos, Ypos, Width]
+
+        nodeAmount++;
     }
 
     let nodesExample = [
-        new Node("Epic example node", "This sample node right here is super freaking epic. Honestly, I don't know if any other example node can beat THIS example node."),
-        new Node("Even epic-cer node", "WOW. I can't believe it!!! This example node is even epicer than the previous one. Hence the name.")
+        new NodeItem("Epic example node", "This sample node right here is super freaking epic. Honestly, I don't know if any other example node can beat THIS example node.", [1], [-50, 20, 400]),
+        new NodeItem("Even epic-cer node", "WOW. I can't believe it!!! This example node is even more the epic-cer than the previous one. Hence the name.", [], [250, 400, 600])
     ];
 
     let DOMeditorNodeContainer = document.querySelector("#editor-node-container");
     nodesExample.forEach((nodeObj) => {
-        // TODO: Create nodes for example
+        // Create elements
+        let nodeContainerElement = document.createElement("div");
+        let nodeTitleElement = document.createElement("p");
+        let nodeContentElement = document.createElement("p");
+
+        // Apply classes & id's
+        nodeContainerElement.className = "nodeContainer";
+        nodeTitleElement.className = "nodeTitle";
+        nodeContentElement.className = "nodeContent";
+
+        // Other attributes
+        nodeTitleElement.textContent = nodeObj.title;
+        nodeContentElement.textContent = nodeObj.content;
+
+        // Add correct node transforms
+        nodeContainerElement.style.left = nodeObj.transform[0] + "px";
+        nodeContainerElement.style.top = nodeObj.transform[1] + "px";
+        nodeContainerElement.style.width = nodeObj.transform[2] + "px";
+
+        // DOM structure
+        nodeContainerElement.appendChild(nodeTitleElement);
+        nodeContainerElement.appendChild(nodeContentElement);
+
+        DOMeditorNodeContainer.appendChild(nodeContainerElement);
     });
     
 
@@ -43,6 +73,18 @@ document.addEventListener('DOMContentLoaded', () => {
             // About button
 
 
+        } else if(e.target.id === "navBtn-file-newFile") {
+            // New file button
+            
+
+        } else if(e.target.id === "navBtn-file-loadFile") {
+            // Load file button
+
+
+        } else if(e.target.id === "navBtn-file-saveAs") {
+            // Save as button
+
+
         } else if(e.target.className.indexOf("subNavOuterBtn") !== -1) {
             let visibleItems = Array.prototype.slice.call(DOMnavSystem.querySelectorAll(".subNav.visible"));
             
@@ -61,8 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
             for(let i = 0; i < visibleItems.length; i++) {
                 visibleItems[i].className = visibleItems[i].className.replace("visible", "hidden");
             }
-            
-
         }
     });
 
@@ -88,6 +128,9 @@ document.addEventListener('DOMContentLoaded', () => {
     DOMeditorToStart.addEventListener('click', () => {
         editorPos = [0, 0];
         DOMeditorPage.style.backgroundPosition = "0 0";
+
+        DOMeditorNodeContainer.style.left = "0";
+        DOMeditorNodeContainer.style.top = "0";
     });
 
     // Window event -- Move mouse around
@@ -102,6 +145,8 @@ document.addEventListener('DOMContentLoaded', () => {
             relativeY = e.clientY - editorPageHeldPos[1] + editorPos[1];
 
             DOMeditorPage.style.backgroundPosition = relativeX + "px " + relativeY + "px";
+            DOMeditorNodeContainer.style.left = relativeX + "px";
+            DOMeditorNodeContainer.style.top = relativeY + "px";
         }
     });
 

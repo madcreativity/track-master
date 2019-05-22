@@ -15,6 +15,7 @@ var createLoadingWindow = () => {
         },
         autoHideMenuBar: true,
         icon: __dirname + '/assets/icons/icon.ico',
+        title: "Tracks",
         frame: false
     });
 
@@ -47,6 +48,7 @@ var createMainWindow = () => {
         },
         autoHideMenuBar: true,
         icon: __dirname + '/assets/icons/icon.ico',
+        title: "Tracks",
         show: false,
         frame: false
     });
