@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
     DOMeditorPage.addEventListener('mousedown', (e) => {
         e = e || window.event;
 
-        if(e.target === DOMeditorPage) {
+        if(e.target === DOMeditorPage || e.target == DOMnodeCanvas) {
             isEditorPageHeld = true;
 
             editorPageHeldPos = [ e.clientX, e.clientY ];
