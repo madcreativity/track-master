@@ -10,11 +10,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Connect windows
     let win = remote.getGlobal('win');
     let winLoading = remote.getGlobal('winLoading');
-
+    
     // Node functionality
+    let filePath = "";
+
+    function NodeObj(nodeJSON) {
+        this.nodes = nodeJSON;
+    }
+    
     let nodes = [
         
     ];
+    
 
     // Create nodes
     let DOMeditorNodeContainer = document.querySelector("#editor-node-container");
@@ -79,6 +86,8 @@ document.addEventListener('DOMContentLoaded', () => {
         DOMeditorNodeContainer.style.left = "0";
         DOMeditorNodeContainer.style.top = "0";
 
+        filePath = "";
+
         // Clear children
         while(DOMeditorNodeContainer.firstChild) {
             DOMeditorNodeContainer.removeChild(DOMeditorNodeContainer.firstChild);
@@ -97,12 +106,40 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    let fileSave = () => {
+        // TODO: Save file
+        let fileDataOut = "";
+        
+        fileDataOut = JSON.stringify(new NodeObj(nodes));
+        
+        fs.writeFile(filePath, fileDataOut, (err) => {
+            if(err) {
+                console.error(err);
+                return;
+            }
+        });
+    }
+
+    let fileSaveAs = () => {
+        dialog.showSaveDialog({
+            filters: [{
+                name: "Branching Writers System",
+                extensions: ["bws"]
+            }]
+        }, (file) => {
+            if (file !== undefined) {
+                filePath = file;
+
+                fileSave();
+            }
+        });
+    }
+
     DOMnavSystem.addEventListener('click', (e) => {
         if(e.target.id === "navBtn-about") {
             closeSubNavs();
 
             // About button
-
 
         } else if(e.target.id === "subNav-file-newFile") {
             // New file button
@@ -121,18 +158,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 }]
             }, (file) => {
                 if (file !== undefined) {
-                    resetEditor();
-
+                    
                     file = file[0];
-
+                    
                     if(file.slice(file.lastIndexOf(".")) === ".bws") {
                         fs.readFile(file, 'utf-8', (err, data) => {
                             if(err) {
                                 console.error("Failed to read file " + file);
                                 return;
                             }
-    
+                            
                             let parsedData = JSON.parse(data);
+                            
+                            resetEditor();
+
+                            filePath = file;
 
                             nodes = parsedData.nodes;
 
@@ -145,16 +185,16 @@ document.addEventListener('DOMContentLoaded', () => {
             // Save as button
             closeSubNavs();
 
-            dialog.showSaveDialog({
-                filters: [{
-                    name: "Branching Writers System",
-                    extensions: ["bws"]
-                }]
-            }, (file) => {
-                if (file !== undefined) {
-                    
-                }
-            });
+            fileSaveAs();
+        } else if(e.target.id === "subNav-file-save") {
+            // Save as button
+            closeSubNavs();
+
+            if(filePath !== "") {
+                fileSave();
+            } else {
+                fileSaveAs();
+            }
         } else if(e.target.className.indexOf("subNavOuterBtn") !== -1) {
             let visibleItems = Array.prototype.slice.call(DOMnavSystem.querySelectorAll(".subNav.visible"));
             
