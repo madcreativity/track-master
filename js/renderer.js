@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Acquire dependencies
     const remote = require('electron').remote;
+    const {dialog} = require('electron').remote;
     const app = remote.app;
     const {ipcRenderer} = require('electron');
     const fs = require('fs');
@@ -11,51 +12,40 @@ document.addEventListener('DOMContentLoaded', () => {
     let winLoading = remote.getGlobal('winLoading');
 
     // Node functionality
-    let nodeAmount = 0;
-
-    function Node(title, content, connections, transform) {
-        this.id = nodeAmount;
-        this.title = title;
-        this.content = content;
-        this.connections = connections; // Array of ID's
-        this.transform = transform; // [Xpos, Ypos, Width]
-
-        nodeAmount++;
-    }
-
-    let nodesExample = [
-        new Node("Epic example node", "This sample node right here is super freaking epic. Honestly, I don't know if any other example node can beat THIS example node.", [1], [-50, 20, 400]),
-        new Node("Even epic-cer node", "WOW. I can't believe it!!! This example node is even more the epic-cer than the previous one. Hence the name.", [], [250, 400, 600])
+    let nodes = [
+        
     ];
 
     // Create nodes
     let DOMeditorNodeContainer = document.querySelector("#editor-node-container");
-    nodesExample.forEach((nodeObj) => {
-        // Create elements
-        let nodeContainerElement = document.createElement("div");
-        let nodeTitleElement = document.createElement("p");
-        let nodeContentElement = document.createElement("p");
-
-        // Apply classes & id's
-        nodeContainerElement.className = "nodeContainer";
-        nodeTitleElement.className = "nodeTitle";
-        nodeContentElement.className = "nodeContent";
-
-        // Other attributes
-        nodeTitleElement.textContent = nodeObj.title;
-        nodeContentElement.textContent = nodeObj.content;
-
-        // Add correct node transforms
-        nodeContainerElement.style.left = nodeObj.transform[0] + "px";
-        nodeContainerElement.style.top = nodeObj.transform[1] + "px";
-        nodeContainerElement.style.width = nodeObj.transform[2] + "px";
-
-        // DOM structure
-        nodeContainerElement.appendChild(nodeTitleElement);
-        nodeContainerElement.appendChild(nodeContentElement);
-
-        DOMeditorNodeContainer.appendChild(nodeContainerElement);
-    });
+    let createNodes = () => {
+        nodes.forEach((nodeObj) => {
+            // Create elements
+            let nodeContainerElement = document.createElement("div");
+            let nodeTitleElement = document.createElement("p");
+            let nodeContentElement = document.createElement("p");
+    
+            // Apply classes & id's
+            nodeContainerElement.className = "nodeContainer";
+            nodeTitleElement.className = "nodeTitle";
+            nodeContentElement.className = "nodeContent";
+    
+            // Other attributes
+            nodeTitleElement.textContent = nodeObj.title;
+            nodeContentElement.textContent = nodeObj.content;
+    
+            // Add correct node transforms
+            nodeContainerElement.style.left = nodeObj.transform[0] + "px";
+            nodeContainerElement.style.top = nodeObj.transform[1] + "px";
+            nodeContainerElement.style.width = nodeObj.transform[2] + "px";
+    
+            // DOM structure
+            nodeContainerElement.appendChild(nodeTitleElement);
+            nodeContainerElement.appendChild(nodeContentElement);
+    
+            DOMeditorNodeContainer.appendChild(nodeContainerElement);
+        });
+    }
 
     // Force node canvas to fill entire screen
     let DOMnodeCanvas = document.querySelector("#editor-node-canvas");
@@ -77,25 +67,94 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Reset editor
+    let resetEditor = () => {
+        // Reset standard properties
+        editorPos = [0, 0];
+        nodes = [];
+        nodeAmount = 0;
+
+        DOMeditorPage.style.backgroundPosition = "0 0";
+
+        DOMeditorNodeContainer.style.left = "0";
+        DOMeditorNodeContainer.style.top = "0";
+
+        // Clear children
+        while(DOMeditorNodeContainer.firstChild) {
+            DOMeditorNodeContainer.removeChild(DOMeditorNodeContainer.firstChild);
+        }
+    }
+
     // Navigation bar
     DOMnavSystem = document.querySelector(".navSystem");
+
+    let closeSubNavs = () => {
+        let visibleItems = Array.prototype.slice.call(DOMnavSystem.querySelectorAll(".subNav.visible"));
+
+        // Hide visible subnavigations
+        for(let i = 0; i < visibleItems.length; i++) {
+            visibleItems[i].className = visibleItems[i].className.replace("visible", "hidden");
+        }
+    }
+
     DOMnavSystem.addEventListener('click', (e) => {
         if(e.target.id === "navBtn-about") {
+            closeSubNavs();
+
             // About button
 
 
-        } else if(e.target.id === "navBtn-file-newFile") {
+        } else if(e.target.id === "subNav-file-newFile") {
             // New file button
-            
+            closeSubNavs();
+        
+            resetEditor();
+        } else if(e.target.id === "subNav-file-openFile") {
+            // Open file button
+            closeSubNavs();
 
-        } else if(e.target.id === "navBtn-file-loadFile") {
-            // Load file button
+            dialog.showOpenDialog({
+                properties: ["openFile"],
+                filters: [{
+                    name: "Branching Writers System",
+                    extensions: ["bws"]
+                }]
+            }, (file) => {
+                if (file !== undefined) {
+                    resetEditor();
 
+                    file = file[0];
 
-        } else if(e.target.id === "navBtn-file-saveAs") {
+                    if(file.slice(file.lastIndexOf(".")) === ".bws") {
+                        fs.readFile(file, 'utf-8', (err, data) => {
+                            if(err) {
+                                console.error("Failed to read file " + file);
+                                return;
+                            }
+    
+                            let parsedData = JSON.parse(data);
+
+                            nodes = parsedData.nodes;
+
+                            createNodes();
+                        });
+                    }
+                }
+            });
+        } else if(e.target.id === "subNav-file-saveAs") {
             // Save as button
+            closeSubNavs();
 
-
+            dialog.showSaveDialog({
+                filters: [{
+                    name: "Branching Writers System",
+                    extensions: ["bws"]
+                }]
+            }, (file) => {
+                if (file !== undefined) {
+                    
+                }
+            });
         } else if(e.target.className.indexOf("subNavOuterBtn") !== -1) {
             let visibleItems = Array.prototype.slice.call(DOMnavSystem.querySelectorAll(".subNav.visible"));
             
