@@ -74,6 +74,8 @@ ipcMain.on('request-mainprocess-action', (event, arg) => {
         isLoading = false;
         winLoading.close();
         win.show();
+    } else if(arg.message === "error-out") {
+        winLoading.webConetnts.executeJavaScript('console.log(' + arg.data + ')');
     }
 });
 

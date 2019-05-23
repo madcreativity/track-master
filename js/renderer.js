@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Hold down space to grab/drag - COMPLETE
     // Hold down left mouse button anywhere on a node and drag to move it (This will select a node as well)
     // Hold down left mouse button on connect dot and drag to another connect dot to connect two nodes
-    // Double-click anywhere on a node to edit it
+    // Double-click anywhere on a node to edit it -- WIP
     // Click a node to select it
     // Press delete to remove a selected node
     
@@ -27,14 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
         e = e || window.event;
 
         if(e.keyCode === 32) {
-            if(curTool === 0 && document.activeElement.getAttribute("contentEditable") !== "true") {
+            if(curTool === 0) {
                 curTool = 1;
                 document.body.classList.replace("tool-edit", "tool-grab");
-
-                let items = document.querySelectorAll("p[contentEditable=true]");
-                items.forEach((item) => {
-                    item.contentEditable = false;
-                });
             }
         }
     });
@@ -46,11 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if(curTool === 1) {
                 curTool = 0;
                 document.body.classList.replace("tool-grab", "tool-edit");
-
-                let items = document.querySelectorAll("p[contentEditable=false]");
-                items.forEach((item) => {
-                    item.contentEditable = true;
-                });
             }
         }
     });
@@ -69,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     nodes.push(nodeObj);
                     
-                    createNodeSingular(nodeObj);
+                    createNodeSingular(nodes.length - 1);
                 }
             }
         }
@@ -90,11 +80,88 @@ document.addEventListener('DOMContentLoaded', () => {
     let nodes = [
         
     ];
+    
+        
+    let createNodeEditor = (nodeContainer) => {
+        // Create elements
+        let nodeEditorContainerElement = document.createElement("form");
+
+        let nodeEditorTitleLabelElement = document.createElement("p");
+        let nodeEditorTitleElement = document.createElement("textarea");
+
+        let nodeEditorContentLabelElement = document.createElement("p");
+        let nodeEditorContentElement = document.createElement("textarea");
+
+        let nodeEditorBtnContainerElement = document.createElement("div");
+        let nodeEditorOkBtnElement = document.createElement("button");
+        let nodeEditorCancelBtnElement = document.createElement("button");
+
+        // Classes & id's
+        nodeEditorContainerElement.className = "singularNodeEditor";
+        nodeEditorTitleElement.className = "singularNodeEditor-title";
+        nodeEditorContentElement.className = "singularNodeEditor-content";
+
+        // Other attributes
+        nodeEditorContainerElement.setAttribute("data-node-id", nodeContainer.getAttribute("data-node-id"));
+
+        nodeEditorTitleElement.value = nodeContainer.querySelector(".nodeTitle").textContent;
+        nodeEditorContentElement.value = nodeContainer.querySelector(".nodeContent").textContent;
+
+        nodeEditorTitleLabelElement.textContent = "Title:";
+        nodeEditorContentLabelElement.textContent = "Content:";
+
+        nodeEditorOkBtnElement.textContent = "Save Changes";
+        nodeEditorCancelBtnElement.textContent = "Cancel";
+
+        nodeEditorContentElement.style.height = "80px";
+
+        nodeEditorOkBtnElement.addEventListener('click', (e) => {
+            e = e || window.event;
+
+            // Apply changes
+            let singularNodeEditor = document.querySelector(".singularNodeEditor");
+            let nodeObj = nodes[singularNodeEditor.getAttribute("data-node-id")];
+            let newTitle = singularNodeEditor.querySelector(".singularNodeEditor-title").value;
+            let newContent = singularNodeEditor.querySelector(".singularNodeEditor-content").value;
+
+            nodeObj.title = newTitle;
+            nodeObj.content = newContent;
+            nodeContainer.querySelector(".nodeTitle").textContent = newTitle;
+            nodeContainer.querySelector(".nodeContent").textContent = newContent;
+
+            // Remove element
+            singularNodeEditor.parentNode.removeChild(singularNodeEditor);
+        });
+
+        nodeEditorCancelBtnElement.addEventListener('click', (e) => {
+            e = e || window.event;
+
+            // Remove element
+            document.querySelector(".singularNodeEditor").parentNode.removeChild(document.querySelector(".singularNodeEditor"));            
+        });
+
+
+        // Element structure
+        nodeEditorContainerElement.appendChild(nodeEditorTitleLabelElement);
+        nodeEditorContainerElement.appendChild(nodeEditorTitleElement);
+
+        nodeEditorContainerElement.appendChild(nodeEditorContentLabelElement);
+        nodeEditorContainerElement.appendChild(nodeEditorContentElement);
+
+        nodeEditorBtnContainerElement.appendChild(nodeEditorOkBtnElement);
+        nodeEditorBtnContainerElement.appendChild(nodeEditorCancelBtnElement);
+
+        nodeEditorContainerElement.appendChild(nodeEditorBtnContainerElement);
+
+        DOMeditorPage.appendChild(nodeEditorContainerElement);
+    }
 
     // Create nodes
     let DOMeditorNodeContainer = document.querySelector("#editor-node-container");
+    
+    let createNodeSingular = (nodeIndex) => {
+        let nodeObj = nodes[nodeIndex];
 
-    let createNodeSingular = (nodeObj) => {
         // Create elements
         let nodeContainerElement = document.createElement("div");
         let nodeTitleElement = document.createElement("p");
@@ -113,8 +180,13 @@ document.addEventListener('DOMContentLoaded', () => {
         nodeTitleElement.textContent = nodeObj.title;
         nodeContentElement.textContent = nodeObj.content;
 
-        nodeTitleElement.contentEditable = true;
-        nodeContentElement.contentEditable = true;
+        nodeContainerElement.setAttribute("data-node-id", nodeIndex)
+
+        nodeContainerElement.addEventListener('dblclick', (e) => {
+            e = e || window.event;
+
+            createNodeEditor(e.currentTarget);
+        });
 
         nodeConnectorOutElement.setAttribute("data-connections", nodeObj.connections);
 
@@ -133,9 +205,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     let createNodes = () => {
-        nodes.forEach((nodeObj) => {
-            createNodeSingular(nodeObj);
-        });
+        for(let i = 0; i < nodes.length; i++) {
+            createNodeSingular(i);
+        }
     }
 
     // Force node canvas to fill entire screen
@@ -184,12 +256,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let fileSave = () => {
         let fileDataOut = "";
 
-        // Apply node changes to objects
-        for(let i = 0; i < nodes.length; i++) {
-            nodes[i].title = DOMeditorNodeContainer.children[i].querySelector(".nodeTitle").textContent;
-            nodes[i].content = DOMeditorNodeContainer.children[i].querySelector(".nodeContent").textContent;
-        }
-        
         fileDataOut = JSON.stringify(new NodeObj(nodes));
         
         fs.writeFile(filePath, fileDataOut, (err) => {

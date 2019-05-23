@@ -252,18 +252,80 @@ body.tool-edit #page-editor:hover {
     transform: translateX(-50%) translateY(-50%);
 }
 
-body.tool-edit #page-editor .nodeTitle, body.tool-edit #page-editor .nodeContent {
-    cursor: text;
-}
-
-body.tool-edit #page-editor .nodeTitle:hover, body.tool-edit #page-editor .nodeContent:hover {
-    border-style: dashed;
-    border-color: #7C7C7C;
-}
-
 #page-editor #editor-node-canvas {
     position: absolute;
     top: 0;
     left: 0;
     z-index: 10;
+}
+
+#page-editor .singularNodeEditor {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    background-color: #F9F9F9;
+    transform: translateX(-50%) translateY(-50%);
+    font-size: 14px;
+    color: #7C7C7C;
+    font-family: Calibri;
+    padding: 10px 20px;
+    border: 1px solid #7C7C7C;
+    border-radius: 3px;
+    box-shadow: 2px 2px 6px 1px rgba(0, 0, 0, 0.25);
+    z-index: 105;
+    max-width: 450px;
+    max-height: 250px;
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+#page-editor .singularNodeEditor:hover {
+    cursor: auto;
+}
+
+#page-editor .singularNodeEditor::-webkit-scrollbar {
+    background-color: transparent;
+    width: 10px;
+}
+
+#page-editor .singularNodeEditor::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+    background-color: #7C7C7C;
+}
+
+#page-editor .singularNodeEditor p {
+    margin: 5px 0;
+}
+
+#page-editor .singularNodeEditor textarea {
+    width: 100%;
+    resize: none;
+    font-family: Calibri;
+    font-size: 14px;
+    color: #7C7C7C;
+    border: 1px solid #7C7C7C;
+    background-color: #FFFFFF;
+    outline-color: #0074FF !important;
+}
+
+#page-editor .singularNodeEditor button {
+    border: 0;
+    padding: 10px 20px;
+    background-color: #0074FF;
+    color: #F9F9F9;
+    border-radius: 21px;
+    margin: 5px;
+    transition: background-color 250ms ease;
+}
+
+#page-editor .singularNodeEditor button:hover {
+    background-color: #00487F;
+}
+
+#page-editor .singularNodeEditor > div {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
 }
