@@ -27,9 +27,14 @@ document.addEventListener('DOMContentLoaded', () => {
         e = e || window.event;
 
         if(e.keyCode === 32) {
-            if(curTool === 0) {
+            if(curTool === 0 && document.activeElement.getAttribute("contentEditable") !== "true") {
                 curTool = 1;
                 document.body.classList.replace("tool-edit", "tool-grab");
+
+                let items = document.querySelectorAll("p[contentEditable=true]");
+                items.forEach((item) => {
+                    item.contentEditable = false;
+                });
             }
         }
     });
@@ -41,6 +46,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if(curTool === 1) {
                 curTool = 0;
                 document.body.classList.replace("tool-grab", "tool-edit");
+
+                let items = document.querySelectorAll("p[contentEditable=false]");
+                items.forEach((item) => {
+                    item.contentEditable = true;
+                });
             }
         }
     });
@@ -96,6 +106,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Other attributes
         nodeTitleElement.textContent = nodeObj.title;
         nodeContentElement.textContent = nodeObj.content;
+
+        nodeTitleElement.contentEditable = true;
+        nodeContentElement.contentEditable = true;
 
         // Add correct node transforms
         nodeContainerElement.style.left = nodeObj.transform[0] + "px";
@@ -159,8 +172,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let filePath = "";
     
     let fileSave = () => {
-        // TODO: Save file
         let fileDataOut = "";
+
+        // Apply node changes to objects
+        for(let i = 0; i < nodes.length; i++) {
+            nodes[i].title = DOMeditorNodeContainer.children[i].querySelector(".nodeTitle").textContent;
+            nodes[i].content = DOMeditorNodeContainer.children[i].querySelector(".nodeContent").textContent;
+        }
         
         fileDataOut = JSON.stringify(new NodeObj(nodes));
         
@@ -200,7 +218,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     DOMnavSystem.addEventListener('click', (e) => {
-        if(e.target.id === "subNav-file-newFile") {
+        if(e.target.id === "subNav-edit-clear") {
+            // Clear
+            closeSubNavs();
+
+            nodes = [];
+            nodeAmount = 0;
+            
+            // Clear children
+            while(DOMeditorNodeContainer.firstChild) {
+                DOMeditorNodeContainer.removeChild(DOMeditorNodeContainer.firstChild);
+            }
+        } else if(e.target.id === "subNav-edit-deselect") {
+            // Deselect
+            closeSubNavs();
+
+            document.body.focus();
+        } else if(e.target.id === "subNav-file-newFile") {
             // New file button
             closeSubNavs();
         
