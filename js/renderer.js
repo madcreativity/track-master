@@ -50,9 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if(curTool === 0) {
             if(e.target === DOMnodeCanvas) {
-                let nodeObj = new NodeItem("Title here", "Content here", [
-                
-                ], [
+                let nodeObj = new NodeItem("Title here", "Content here", [], [
                     e.clientX - editorPos[0],
                     e.clientY - editorPos[1],
                     300
