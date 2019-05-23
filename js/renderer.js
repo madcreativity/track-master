@@ -431,14 +431,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Draggable background - Move if left mouse button is held down
         if(isEditorPageHeld) {
-            let relativeX, relativeY;
+            if(curTool === 1) {
+                let relativeX, relativeY;
 
-            relativeX = e.clientX - editorPageHeldPos[0] + editorPos[0];
-            relativeY = e.clientY - editorPageHeldPos[1] + editorPos[1];
+                relativeX = e.clientX - editorPageHeldPos[0] + editorPos[0];
+                relativeY = e.clientY - editorPageHeldPos[1] + editorPos[1];
 
-            DOMeditorPage.style.backgroundPosition = relativeX + "px " + relativeY + "px";
-            DOMeditorNodeContainer.style.left = relativeX + "px";
-            DOMeditorNodeContainer.style.top = relativeY + "px";
+                DOMeditorPage.style.backgroundPosition = relativeX + "px " + relativeY + "px";
+                DOMeditorNodeContainer.style.left = relativeX + "px";
+                DOMeditorNodeContainer.style.top = relativeY + "px";
+            } else {
+                isEditorPageHeld = false;
+
+                editorPos[0] = e.clientX - editorPageHeldPos[0] + editorPos[0];
+                editorPos[1] = e.clientY - editorPageHeldPos[1] + editorPos[1];
+            }
         }
     });
 
