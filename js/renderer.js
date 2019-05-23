@@ -58,17 +58,19 @@ document.addEventListener('DOMContentLoaded', () => {
     DOMeditorPage.addEventListener('click', (e) => {
         e = e || window.event;
 
-        if(curTool === 0) {
-            if(e.target === DOMnodeCanvas) {
-                let nodeObj = new NodeItem("Title here", "Content here", [], [
-                    e.clientX - editorPos[0],
-                    e.clientY - editorPos[1],
-                    300
-                ]);
-
-                nodes.push(nodeObj);
-    
-                createNodeSingular(nodeObj);
+        if(!closeSubNavs()) {
+            if(curTool === 0) {
+                if(e.target === DOMnodeCanvas) {
+                    let nodeObj = new NodeItem("Title here", "Content here", [], [
+                        e.clientX - editorPos[0],
+                        e.clientY - editorPos[1],
+                        300
+                    ]);
+                    
+                    nodes.push(nodeObj);
+                    
+                    createNodeSingular(nodeObj);
+                }
             }
         }
     });
@@ -215,6 +217,12 @@ document.addEventListener('DOMContentLoaded', () => {
         for(let i = 0; i < visibleItems.length; i++) {
             visibleItems[i].className = visibleItems[i].className.replace("visible", "hidden");
         }
+
+        if(visibleItems.length) {
+            return true;
+        }
+
+        return false;
     }
 
     DOMnavSystem.addEventListener('click', (e) => {
