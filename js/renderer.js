@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let winLoading = remote.getGlobal('winLoading');
 
     // Editor page -- tools
-    // Hold down space to grab/drag
+    // Hold down space to grab/drag - COMPLETE
     // Hold down left mouse button anywhere on a node and drag to move it (This will select a node as well)
     // Hold down left mouse button on connect dot and drag to another connect dot to connect two nodes
     // Double-click anywhere on a node to edit it
@@ -99,11 +99,15 @@ document.addEventListener('DOMContentLoaded', () => {
         let nodeContainerElement = document.createElement("div");
         let nodeTitleElement = document.createElement("p");
         let nodeContentElement = document.createElement("p");
+        let nodeConnectorInElement = document.createElement("div");
+        let nodeConnectorOutElement = document.createElement("div");
 
         // Apply classes & id's
         nodeContainerElement.className = "nodeContainer";
         nodeTitleElement.className = "nodeTitle";
         nodeContentElement.className = "nodeContent";
+        nodeConnectorInElement.className = "nodeConnector connectorIn";
+        nodeConnectorOutElement.className = "nodeConnector connectorOut";
 
         // Other attributes
         nodeTitleElement.textContent = nodeObj.title;
@@ -111,6 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         nodeTitleElement.contentEditable = true;
         nodeContentElement.contentEditable = true;
+
+        nodeConnectorOutElement.setAttribute("data-connections", nodeObj.connections);
 
         // Add correct node transforms
         nodeContainerElement.style.left = nodeObj.transform[0] + "px";
@@ -120,6 +126,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // DOM structure
         nodeContainerElement.appendChild(nodeTitleElement);
         nodeContainerElement.appendChild(nodeContentElement);
+        nodeContainerElement.appendChild(nodeConnectorInElement);
+        nodeContainerElement.appendChild(nodeConnectorOutElement);
 
         DOMeditorNodeContainer.appendChild(nodeContainerElement);
     }
