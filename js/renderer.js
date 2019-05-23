@@ -10,9 +10,68 @@ document.addEventListener('DOMContentLoaded', () => {
     // Connect windows
     let win = remote.getGlobal('win');
     let winLoading = remote.getGlobal('winLoading');
+
+    // Editor page -- tools
+    // Hold down space to grab/drag
+    // Hold down left mouse button anywhere on a node and drag to move it (This will select a node as well)
+    // Hold down left mouse button on connect dot and drag to another connect dot to connect two nodes
+    // Double-click anywhere on a node to edit it
+    // Click a node to select it
+    // Press delete to remove a selected node
+    
+    let curTool = 0; // Add/Edit/Delete/Move/Connect, Grab/Drag
+
+    let DOMeditorPage = document.querySelector("#page-editor");
+
+    window.addEventListener('keydown', (e) => {
+        e = e || window.event;
+
+        if(e.keyCode === 32) {
+            if(curTool === 0) {
+                curTool = 1;
+                document.body.classList.replace("tool-edit", "tool-grab");
+            }
+        }
+    });
+
+    window.addEventListener('keyup', (e) => {
+        e = e || window.event;
+
+        if(e.keyCode === 32) {
+            if(curTool === 1) {
+                curTool = 0;
+                document.body.classList.replace("tool-grab", "tool-edit");
+            }
+        }
+    });
+
+    DOMeditorPage.addEventListener('click', (e) => {
+        e = e || window.event;
+
+        if(curTool === 0) {
+            if(e.target === DOMnodeCanvas) {
+                let nodeObj = new NodeItem("Title here", "Content here", [
+                
+                ], [
+                    e.clientX - editorPos[0],
+                    e.clientY - editorPos[1],
+                    300
+                ]);
+
+                nodes.push(nodeObj);
+    
+                createNodeSingular(nodeObj);
+            }
+        }
+    });
     
     // Node functionality
-    let filePath = "";
+    function NodeItem(title, content, connections, transform) {
+        this.title = title;
+        this.content = content;
+        this.connections = connections;
+        this.transform = transform;
+    }
 
     function NodeObj(nodeJSON) {
         this.nodes = nodeJSON;
@@ -21,36 +80,40 @@ document.addEventListener('DOMContentLoaded', () => {
     let nodes = [
         
     ];
-    
 
     // Create nodes
     let DOMeditorNodeContainer = document.querySelector("#editor-node-container");
+
+    let createNodeSingular = (nodeObj) => {
+        // Create elements
+        let nodeContainerElement = document.createElement("div");
+        let nodeTitleElement = document.createElement("p");
+        let nodeContentElement = document.createElement("p");
+
+        // Apply classes & id's
+        nodeContainerElement.className = "nodeContainer";
+        nodeTitleElement.className = "nodeTitle";
+        nodeContentElement.className = "nodeContent";
+
+        // Other attributes
+        nodeTitleElement.textContent = nodeObj.title;
+        nodeContentElement.textContent = nodeObj.content;
+
+        // Add correct node transforms
+        nodeContainerElement.style.left = nodeObj.transform[0] + "px";
+        nodeContainerElement.style.top = nodeObj.transform[1] + "px";
+        nodeContainerElement.style.width = nodeObj.transform[2] + "px";
+
+        // DOM structure
+        nodeContainerElement.appendChild(nodeTitleElement);
+        nodeContainerElement.appendChild(nodeContentElement);
+
+        DOMeditorNodeContainer.appendChild(nodeContainerElement);
+    }
+
     let createNodes = () => {
         nodes.forEach((nodeObj) => {
-            // Create elements
-            let nodeContainerElement = document.createElement("div");
-            let nodeTitleElement = document.createElement("p");
-            let nodeContentElement = document.createElement("p");
-    
-            // Apply classes & id's
-            nodeContainerElement.className = "nodeContainer";
-            nodeTitleElement.className = "nodeTitle";
-            nodeContentElement.className = "nodeContent";
-    
-            // Other attributes
-            nodeTitleElement.textContent = nodeObj.title;
-            nodeContentElement.textContent = nodeObj.content;
-    
-            // Add correct node transforms
-            nodeContainerElement.style.left = nodeObj.transform[0] + "px";
-            nodeContainerElement.style.top = nodeObj.transform[1] + "px";
-            nodeContainerElement.style.width = nodeObj.transform[2] + "px";
-    
-            // DOM structure
-            nodeContainerElement.appendChild(nodeTitleElement);
-            nodeContainerElement.appendChild(nodeContentElement);
-    
-            DOMeditorNodeContainer.appendChild(nodeContainerElement);
+            createNodeSingular(nodeObj);
         });
     }
 
@@ -94,18 +157,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Navigation bar
-    DOMnavSystem = document.querySelector(".navSystem");
-
-    let closeSubNavs = () => {
-        let visibleItems = Array.prototype.slice.call(DOMnavSystem.querySelectorAll(".subNav.visible"));
-
-        // Hide visible subnavigations
-        for(let i = 0; i < visibleItems.length; i++) {
-            visibleItems[i].className = visibleItems[i].className.replace("visible", "hidden");
-        }
-    }
-
+    // File functionality
+    let filePath = "";
+    
     let fileSave = () => {
         // TODO: Save file
         let fileDataOut = "";
@@ -135,13 +189,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Navigation bar
+    DOMnavSystem = document.querySelector(".navSystem");
+
+    let closeSubNavs = () => {
+        let visibleItems = Array.prototype.slice.call(DOMnavSystem.querySelectorAll(".subNav.visible"));
+
+        // Hide visible subnavigations
+        for(let i = 0; i < visibleItems.length; i++) {
+            visibleItems[i].className = visibleItems[i].className.replace("visible", "hidden");
+        }
+    }
+
     DOMnavSystem.addEventListener('click', (e) => {
-        if(e.target.id === "navBtn-about") {
-            closeSubNavs();
-
-            // About button
-
-        } else if(e.target.id === "subNav-file-newFile") {
+        if(e.target.id === "subNav-file-newFile") {
             // New file button
             closeSubNavs();
         
@@ -169,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                             
                             let parsedData = JSON.parse(data);
-                            
+
                             resetEditor();
 
                             filePath = file;
@@ -218,7 +279,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // Draggable editor page
-    let DOMeditorPage = document.querySelector("#page-editor");
     let isEditorPageHeld = false;
     let editorPageHeldPos = [0, 0];
     let editorPos = [0, 0];
@@ -226,21 +286,29 @@ document.addEventListener('DOMContentLoaded', () => {
     DOMeditorPage.addEventListener('mousedown', (e) => {
         e = e || window.event;
 
-        if(e.target === DOMeditorPage || e.target == DOMnodeCanvas) {
-            isEditorPageHeld = true;
-
-            editorPageHeldPos = [ e.clientX, e.clientY ];
+        if(e.button === 0) {
+            if(curTool === 1) {
+                if(e.target !== DOMeditorToStart) {
+                    isEditorPageHeld = true;
+    
+                    editorPageHeldPos = [ e.clientX, e.clientY ];
+                }
+            }
         }
     });
 
     // Editor page -- "To Start" button
     let DOMeditorToStart = document.querySelector("#editor-to-start");
-    DOMeditorToStart.addEventListener('click', () => {
-        editorPos = [0, 0];
-        DOMeditorPage.style.backgroundPosition = "0 0";
+    DOMeditorToStart.addEventListener('click', (e) => {
+        e = e || window.event;
+        
+        if(e.button === 0) {
+            editorPos = [0, 0];
+            DOMeditorPage.style.backgroundPosition = "0 0";
 
-        DOMeditorNodeContainer.style.left = "0";
-        DOMeditorNodeContainer.style.top = "0";
+            DOMeditorNodeContainer.style.left = "0";
+            DOMeditorNodeContainer.style.top = "0";
+        }
     });
 
     // Window event -- Move mouse around

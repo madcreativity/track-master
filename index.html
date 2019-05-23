@@ -7,7 +7,7 @@
 
         <title>Tracks</title>
     </head>
-    <body>
+    <body class="tool-edit">
         <header id="windowFrame">
             <img src="./assets/images/icon.png" id="windowIcon">
 
@@ -22,7 +22,12 @@
                             <li><button class="subNavBtn" id="subNav-file-saveAs">Save As</button></li>
                         </ul>
                     </li>
-                    <li><button class="navBtn" id="navBtn-about">About</button></li>
+                    <li>
+                        <button class="navBtn subNavOuterBtn" id="navBtn-edit">Edit</button>
+                        <ul class="subNav hidden">
+                            <li><button class="subNavBtn" id="subNav-edit-clear">Clear</button></li>
+                        </ul>
+                    </li>
                 </ul>
             </nav>
 
