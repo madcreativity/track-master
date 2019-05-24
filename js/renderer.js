@@ -12,24 +12,21 @@ document.addEventListener('DOMContentLoaded', () => {
     let winLoading = remote.getGlobal('winLoading');
 
     // Editor page -- tools
-    // Hold down space to grab/drag - COMPLETE
-    // Hold down left mouse button anywhere on a node and drag to move it (This will select a node as well)
-    // Hold down left mouse button on connect dot and drag to another connect dot to connect two nodes
-    // Double-click anywhere on a node to edit it -- WIP
-    // Click a node to select it
-    // Press delete to remove a selected node
+    // Hold down left mouse button on connection dot and drag to another connection dot to connect two nodes
     
-    let curTool = 0; // Add/Edit/Delete/Move/Connect, Grab/Drag
+    let curTool = 0; // Edit, Grab
 
     let DOMeditorPage = document.querySelector("#page-editor");
 
     window.addEventListener('keydown', (e) => {
         e = e || window.event;
 
-        if(e.keyCode === 32) {
-            if(curTool === 0) {
+        if(curTool === 0) {
+            if(e.keyCode === 32) {
                 curTool = 1;
                 document.body.classList.replace("tool-edit", "tool-grab");
+            } else if(e.keyCode === 46 && heldNode.parentNode !== null) {
+                heldNode.parentNode.removeChild(heldNode);
             }
         }
     });
@@ -60,12 +57,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     nodes.push(nodeObj);
                     
-                    let newNode = createNodeSingular(nodes.length - 1);
+                    heldNode = createNodeSingular(nodes.length - 1);
 
                     // Select newly created node
                     deselectNodes();
 
-                    newNode.classList.add("selected");
+                    heldNode.classList.add("selected");
                 }
             }
         }
@@ -226,6 +223,9 @@ document.addEventListener('DOMContentLoaded', () => {
         for(let i = 0; i < nodes.length; i++) {
             createNodeSingular(i);
         }
+
+        heldNode = DOMeditorNodeContainer.lastChild;
+        heldNode.classList.add("selected");
     }
 
     // Force node canvas to fill entire screen
@@ -493,8 +493,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 heldNode.style.left = relativeX + "px";
                 heldNode.style.top = relativeY + "px";
-
-                console.log(relativeX + "px");
             }
         }
     });
@@ -511,6 +509,10 @@ document.addEventListener('DOMContentLoaded', () => {
             editorPos[1] = e.clientY - editorPageHeldPos[1] + editorPos[1];
         } else if(isNodeHeld) {
             isNodeHeld = false;
+
+            let nodeId = heldNode.getAttribute("data-node-id")
+            nodes[nodeId].transform[0] = parseInt(heldNode.style.left.replace("px", ""));
+            nodes[nodeId].transform[1] = parseInt(heldNode.style.top.replace("px", ""));
         }
     });
 
