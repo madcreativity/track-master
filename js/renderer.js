@@ -66,16 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     deselectNodes();
 
                     newNode.classList.add("selected");
-                } else if(e.target.classList.contains("nodeContainer")) {
-                    deselectNodes();
-
-                    // Select clicked element
-                    e.target.classList.add("selected");
-                } else if(e.target.classList.contains("nodeTitle") || e.target.classList.contains("nodeContent")) {
-                    deselectNodes();
-
-                    // Select clicked element
-                    e.target.parentNode.classList.add("selected");
                 }
             }
         }
@@ -425,6 +415,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let editorPageHeldPos = [0, 0];
     let editorPos = [0, 0];
 
+    let isNodeHeld = false;
+    let nodeHeldPos = [0, 0];
+    let nodePos = [ 0, 0 ];
+    let heldNode = null;
+
     DOMeditorPage.addEventListener('mousedown', (e) => {
         e = e || window.event;
 
@@ -434,6 +429,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     isEditorPageHeld = true;
     
                     editorPageHeldPos = [ e.clientX, e.clientY ];
+                }
+            } else if(curTool === 0) {
+                if(e.target.classList.contains("nodeContainer") || e.target.classList.contains("nodeTitle") || e.target.classList.contains("nodeContent")) {
+                    // Select clicked element
+                    deselectNodes();
+
+                    if(e.target.classList.contains("nodeContainer")) e.target.classList.add("selected");
+                    else e.target.parentNode.classList.add("selected");
+                    
+                    isNodeHeld = true;
+
+                    nodeHeldPos = [ e.clientX, e.clientY ];
+
+                    heldNode = document.querySelector(".nodeContainer.selected");
+                    nodePos = [ parseInt(heldNode.style.left.replace("px", "")), parseInt(heldNode.style.top.replace("px", "")) ];
                 }
             }
         }
@@ -474,6 +484,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 editorPos[0] = e.clientX - editorPageHeldPos[0] + editorPos[0];
                 editorPos[1] = e.clientY - editorPageHeldPos[1] + editorPos[1];
             }
+        } else if(isNodeHeld) {
+            if(curTool === 0) {
+                let relativeX, relativeY;
+
+                relativeX = e.clientX - nodeHeldPos[0] + nodePos[0];
+                relativeY = e.clientY - nodeHeldPos[1] + nodePos[1];
+
+                heldNode.style.left = relativeX + "px";
+                heldNode.style.top = relativeY + "px";
+
+                console.log(relativeX + "px");
+            }
         }
     });
 
@@ -487,6 +509,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             editorPos[0] = e.clientX - editorPageHeldPos[0] + editorPos[0];
             editorPos[1] = e.clientY - editorPageHeldPos[1] + editorPos[1];
+        } else if(isNodeHeld) {
+            isNodeHeld = false;
         }
     });
 
