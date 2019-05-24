@@ -217,7 +217,7 @@ body.tool-edit #page-editor:hover {
     box-shadow: 2px 2px 8px 0 rgba(0, 116, 255, 0.4);
 }
 
-#page-editor .nodeContainer:hover {
+body.tool-edit #page-editor .nodeContainer:hover {
     cursor: pointer;
 }
 

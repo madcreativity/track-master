@@ -60,7 +60,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     nodes.push(nodeObj);
                     
-                    createNodeSingular(nodes.length - 1);
+                    let newNode = createNodeSingular(nodes.length - 1);
+
+                    // Select newly created node
+                    deselectNodes();
+
+                    newNode.classList.add("selected");
                 } else if(e.target.classList.contains("nodeContainer")) {
                     deselectNodes();
 
@@ -91,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let nodes = [
         
     ];
-    
+
 
     let deselectNodes = () => {
         // Deselect all other selected elements
@@ -223,6 +228,8 @@ document.addEventListener('DOMContentLoaded', () => {
         nodeContainerElement.appendChild(nodeConnectorOutElement);
 
         DOMeditorNodeContainer.appendChild(nodeContainerElement);
+
+        return nodeContainerElement;
     }
 
     let createNodes = () => {
