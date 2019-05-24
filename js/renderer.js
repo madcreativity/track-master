@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     DOMeditorPage.addEventListener('click', (e) => {
         e = e || window.event;
 
+        
         if(!closeSubNavs()) {
             if(curTool === 0) {
                 if(e.target === DOMnodeCanvas) {
@@ -60,6 +61,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     nodes.push(nodeObj);
                     
                     createNodeSingular(nodes.length - 1);
+                } else if(e.target.classList.contains("nodeContainer")) {
+                    deselectNodes();
+
+                    // Select clicked element
+                    e.target.classList.add("selected");
+                } else if(e.target.classList.contains("nodeTitle") || e.target.classList.contains("nodeContent")) {
+                    deselectNodes();
+
+                    // Select clicked element
+                    e.target.parentNode.classList.add("selected");
                 }
             }
         }
@@ -81,6 +92,16 @@ document.addEventListener('DOMContentLoaded', () => {
         
     ];
     
+
+    let deselectNodes = () => {
+        // Deselect all other selected elements
+        let selectedNodes = document.querySelectorAll(".nodeContainer.selected");
+        if(selectedNodes !== null) {
+            for(let i = 0; i < selectedNodes.length; i++) {
+                selectedNodes[i].classList.remove("selected");
+            }
+        }
+    }
         
     let createNodeEditor = (nodeContainer) => {
         // Create elements

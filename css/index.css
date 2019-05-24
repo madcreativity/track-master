@@ -169,7 +169,7 @@ body.tool-grab #page-editor:active {
 }
 
 body.tool-edit #page-editor:hover {
-    cursor: pointer;
+    cursor: crosshair;
 }
 
 #page-editor #editor-to-start {
@@ -210,6 +210,15 @@ body.tool-edit #page-editor:hover {
     border: 1px solid #7C7C7C;
     box-shadow: 2px 2px 6px 0 rgba(0, 0, 0, 0.2);
     -webkit-user-select: none;
+}
+
+#page-editor .nodeContainer.selected {
+    border-color: #0074FF;
+    box-shadow: 2px 2px 8px 0 rgba(0, 116, 255, 0.4);
+}
+
+#page-editor .nodeContainer:hover {
+    cursor: pointer;
 }
 
 #page-editor .nodeTitle {
@@ -316,6 +325,7 @@ body.tool-edit #page-editor:hover {
     color: #F9F9F9;
     border-radius: 21px;
     margin: 5px;
+    outline: none !important;
     transition: background-color 250ms ease;
 }
 
