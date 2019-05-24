@@ -343,7 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Deselect
             closeSubNavs();
 
-            document.body.focus();
+            deselectNodes();
         } else if(e.target.id === "subNav-file-newFile") {
             // New file button
             closeSubNavs();
