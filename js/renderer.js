@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 curTool = 1;
                 document.body.classList.replace("tool-edit", "tool-grab");
             } else if(e.keyCode === 46 && heldNode.parentNode !== null) {
+                nodes.splice(heldNode.getAttribute("data-node-id"), 1);
                 heldNode.parentNode.removeChild(heldNode);
             }
         }
