@@ -187,6 +187,7 @@ body.tool-edit #page-editor:hover {
 
 #page-editor #editor-to-start:hover {
     background-color: #00487F;
+    cursor: default;
 }
 
 #page-editor #editor-to-start p {

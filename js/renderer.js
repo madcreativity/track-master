@@ -237,6 +237,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', (e) => {
         DOMnodeCanvas.width = window.innerWidth;
         DOMnodeCanvas.height = window.innerHeight;
+
+        updateCanvas();
     });
 
     // Window buttons
@@ -267,6 +269,8 @@ document.addEventListener('DOMContentLoaded', () => {
         while(DOMeditorNodeContainer.firstChild) {
             DOMeditorNodeContainer.removeChild(DOMeditorNodeContainer.firstChild);
         }
+
+        updateCanvas();
     }
 
     // File functionality
@@ -371,6 +375,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             nodes = parsedData.nodes;
 
                             createNodes();
+                            
+                            updateCanvas();
                         });
                     }
                 }
@@ -444,7 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     nodeHeldPos = [ e.clientX, e.clientY ];
 
                     heldNode = document.querySelector(".nodeContainer.selected");
-                    nodePos = [ parseInt(heldNode.style.left.replace("px", "")), parseInt(heldNode.style.top.replace("px", "")) ];
+                    nodePos = [ heldNode.offsetLeft, heldNode.offsetTop ];
                 }
             }
         }
@@ -461,6 +467,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             DOMeditorNodeContainer.style.left = "0";
             DOMeditorNodeContainer.style.top = "0";
+
+            updateCanvas();
         }
     });
 
@@ -479,6 +487,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 DOMeditorPage.style.backgroundPosition = relativeX + "px " + relativeY + "px";
                 DOMeditorNodeContainer.style.left = relativeX + "px";
                 DOMeditorNodeContainer.style.top = relativeY + "px";
+
+                updateCanvas(relativeX, relativeY);
             } else {
                 isEditorPageHeld = false;
 
@@ -494,6 +504,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 heldNode.style.left = relativeX + "px";
                 heldNode.style.top = relativeY + "px";
+
+                updateCanvas();
             }
         }
     });
@@ -512,11 +524,72 @@ document.addEventListener('DOMContentLoaded', () => {
             isNodeHeld = false;
 
             let nodeId = heldNode.getAttribute("data-node-id")
-            nodes[nodeId].transform[0] = parseInt(heldNode.style.left.replace("px", ""));
-            nodes[nodeId].transform[1] = parseInt(heldNode.style.top.replace("px", ""));
+            nodes[nodeId].transform[0] = heldNode.offsetLeft;
+            nodes[nodeId].transform[1] = heldNode.offsetTop;
         }
     });
+    
+    // Canvas functionality
+    let ctx = DOMnodeCanvas.getContext("2d");
 
+    ctx.fillStyle = "#707070";
+
+    let drawCurve = (curve, offset) => {
+        offset = offset || { x:0, y:0 };
+
+        var ox = offset.x;
+        var oy = offset.y;
+        var p = curve.points, i;
+        
+        ctx.beginPath();
+        ctx.moveTo(p[0].x + ox, p[0].y + oy);
+
+        if(p.length === 3) {
+            ctx.quadraticCurveTo(
+                p[1].x + ox, p[1].y + oy,
+                p[2].x + ox, p[2].y + oy
+            );
+        }
+
+        if(p.length === 4) {
+            ctx.bezierCurveTo(
+                p[1].x + ox, p[1].y + oy,
+                p[2].x + ox, p[2].y + oy,
+                p[3].x + ox, p[3].y + oy
+            );
+        }
+
+        ctx.stroke();
+        ctx.closePath();
+    }
+
+    let updateCanvas = (offsetX, offsetY) => {
+        offsetX = offsetX || editorPos[0];
+        offsetY = offsetY || editorPos[1];
+
+        // Clear canvas
+        ctx.clearRect(0, 0, DOMnodeCanvas.width, DOMnodeCanvas.height);
+
+        // Draw connection curves
+        for(let i = 0; i < nodes.length; i++) {
+            for(let n = 0; n < nodes[i].connections.length; n++) {
+                let node = DOMeditorNodeContainer.children[i];
+                let connectedNode = DOMeditorNodeContainer.children[nodes[i].connections[n]];
+                
+                let curve = new bezier([
+                    {x: node.offsetLeft + node.clientWidth + offsetX, y: node.offsetTop + (node.clientHeight / 2) + offsetY},
+                    {x: (node.offsetLeft + node.clientWidth) + (connectedNode.offsetLeft - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: node.offsetTop + (node.clientHeight / 2) + offsetY},
+                    {x: (node.offsetLeft + node.clientWidth) + (connectedNode.offsetLeft - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: connectedNode.offsetTop + (connectedNode.clientHeight / 2) + offsetY},
+                    {x: connectedNode.offsetLeft + offsetX, y: connectedNode.offsetTop + (connectedNode.clientHeight / 2) + offsetY}
+                ]);
+                
+                drawCurve(curve);
+            }
+        }
+    }
+
+    updateCanvas();
+    
     // Loading completed
     ipcRenderer.send('request-mainprocess-action', {
         message: "loading-end"
