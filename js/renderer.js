@@ -15,11 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Hold down left mouse button on connection dot and drag to another connection dot to connect two nodes
     
     let curTool = 0; // Edit, Grab
-
+    let keyMap = {};
     let DOMeditorPage = document.querySelector("#page-editor");
 
     window.addEventListener('keydown', (e) => {
         e = e || window.event;
+        keyMap[e.keyCode] = e.type == 'keydown';        
 
         if(curTool === 0) {
             if(e.keyCode === 32) {
@@ -28,6 +29,15 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if(e.keyCode === 46 && heldNode.parentNode !== null) {
                 nodes.splice(heldNode.getAttribute("data-node-id"), 1);
                 heldNode.parentNode.removeChild(heldNode);
+            }
+        }
+
+        // CTRL + S to save
+        if(keyMap[17] && keyMap[83]) {
+            if(filePath !== "") {
+                fileSave();
+            } else {
+                fileSaveAs();
             }
         }
     });
@@ -41,6 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.body.classList.replace("tool-grab", "tool-edit");
             }
         }
+
+        keyMap[e.keyCode] = e.type == 'keydown';
     });
 
     DOMeditorPage.addEventListener('click', (e) => {
