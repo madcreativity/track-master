@@ -588,14 +588,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 let node = DOMeditorNodeContainer.children[i];
                 let connectedNode = DOMeditorNodeContainer.children[nodes[i].connections[n]];
                 
-                let curve = new bezier([
-                    {x: node.offsetLeft + node.clientWidth + offsetX, y: node.offsetTop + (node.clientHeight / 2) + offsetY},
-                    {x: (node.offsetLeft + node.clientWidth) + (connectedNode.offsetLeft - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: node.offsetTop + (node.clientHeight / 2) + offsetY},
-                    {x: (node.offsetLeft + node.clientWidth) + (connectedNode.offsetLeft - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: connectedNode.offsetTop + (connectedNode.clientHeight / 2) + offsetY},
-                    {x: connectedNode.offsetLeft + offsetX, y: connectedNode.offsetTop + (connectedNode.clientHeight / 2) + offsetY}
-                ]);
+                let curve;
+
+                if(node.offsetLeft + node.clientWidth > connectedNode.offsetLeft) {
+                    /* Works when connected node's left side is to the left of the current node */
+                    curve = new bezier([
+                        {x: node.offsetLeft + node.clientWidth + offsetX, y: node.offsetTop + (node.clientHeight / 2) + offsetY},
+                        {x: (node.offsetLeft + node.clientWidth) - (connectedNode.offsetLeft - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: node.offsetTop + node.clientHeight + (connectedNode.offsetTop - node.offsetTop - node.clientHeight) / 2 + offsetY},
+                        {x: (connectedNode.offsetLeft) + (connectedNode.offsetLeft - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: node.offsetTop + node.clientHeight + (connectedNode.offsetTop - node.offsetTop - node.clientHeight) / 2 + offsetY},
+                        {x: connectedNode.offsetLeft + offsetX, y: connectedNode.offsetTop + (connectedNode.clientHeight / 2) + offsetY}
+                    ]);
+                } else {
+                    /* Works when connected node's left side is to the right of the current node */
+                    curve = new bezier([
+                        {x: node.offsetLeft + node.clientWidth + offsetX, y: node.offsetTop + (node.clientHeight / 2) + offsetY},
+                        {x: (node.offsetLeft + node.clientWidth) + (connectedNode.offsetLeft - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: node.offsetTop + (node.clientHeight / 2) + offsetY},
+                        {x: (node.offsetLeft + node.clientWidth) + (connectedNode.offsetLeft - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: connectedNode.offsetTop + (connectedNode.clientHeight / 2) + offsetY},
+                        {x: connectedNode.offsetLeft + offsetX, y: connectedNode.offsetTop + (connectedNode.clientHeight / 2) + offsetY}
+                    ]);
+                }
                 
                 drawCurve(curve);
+
+                /* Debug curve handles */
+                /*ctx.fillStyle = "#0000EE";
+                ctx.fillRect(curve.points[1].x - 5, curve.points[1].y - 5, 10, 10);
+
+                ctx.fillStyle = "#EE0000";
+                ctx.fillRect(curve.points[2].x - 5, curve.points[2].y - 5, 10, 10);
+                ctx.fillStyle = "#707070";*/
             }
         }
     }
