@@ -29,28 +29,30 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if(e.keyCode === 46 && heldNode.parentNode !== null) {
                 let nodeId = heldNode.getAttribute("data-node-id");
                 
+                // Remove node element
                 nodes.splice(nodeId, 1);
                 heldNode.parentNode.removeChild(heldNode);
                 
+                // Remove all connections to nodes
                 for(let n = 0; n < nodes.length; n++) {
                     let thisNodePos = nodes[n].connections.indexOf(nodeId);
-
+                    
                     if(thisNodePos !== -1) {
                         nodes[n].connections.splice(thisNodePos, 1);
                     }
 
                     for(let i = 0; i < nodes[n].connections.length; i++) {
                         if(nodes[n].connections[i] > nodeId) {
-                            nodes[n].connections[i]--;
+                            nodes[n].connections[i] = (parseInt(nodes[n].connections[i]) - 1).toString();
                         }
                     }
                     
                     let thisNodeElement = DOMeditorNodeContainer.children[n];
-                    if(nodeId < thisNodeElement.getAttribute("data-node-id")) {
+                    if(thisNodeElement.getAttribute("data-node-id") > nodeId) {
                         thisNodeElement.setAttribute("data-node-id", thisNodeElement.getAttribute("data-node-id") - 1);
                     }
                 }
-
+                
 
                 updateCanvas();
             }
@@ -639,7 +641,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let curve;
 
                 if(node.offsetLeft + node.clientWidth > connectedNode.offsetLeft) {
-                    /* Works when connected node's left side is to the left of the current node */
+                    // Works when connected node's left side is to the left of the current node
                     curve = new bezier([
                         {x: node.offsetLeft + node.clientWidth + offsetX, y: node.offsetTop + (node.clientHeight / 2) + offsetY},
                         {x: (node.offsetLeft + node.clientWidth) - (connectedNode.offsetLeft - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: node.offsetTop + node.clientHeight + (connectedNode.offsetTop - node.offsetTop - node.clientHeight) / 2 + offsetY},
@@ -647,7 +649,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         {x: connectedNode.offsetLeft + offsetX, y: connectedNode.offsetTop + (connectedNode.clientHeight / 2) + offsetY}
                     ]);
                 } else {
-                    /* Works when connected node's left side is to the right of the current node */
+                    // Works when connected node's left side is to the right of the current node
                     curve = new bezier([
                         {x: node.offsetLeft + node.clientWidth + offsetX, y: node.offsetTop + (node.clientHeight / 2) + offsetY},
                         {x: (node.offsetLeft + node.clientWidth) + (connectedNode.offsetLeft - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: node.offsetTop + (node.clientHeight / 2) + offsetY},
@@ -675,19 +677,19 @@ document.addEventListener('DOMContentLoaded', () => {
             let curve;
 
             if(node.offsetLeft + node.clientWidth > mouseConnectionPos[0] - offsetX) {
-                /* Works when connected node's left side is to the left of the current node */
+                // Works when mouse is to the left of current node
                 curve = new bezier([
                     {x: node.offsetLeft + node.clientWidth + offsetX, y: node.offsetTop + (node.clientHeight / 2) + offsetY},
-                    {x: (node.offsetLeft + node.clientWidth) - (mouseConnectionPos[0] - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: node.offsetTop + node.clientHeight + (mouseConnectionPos[1] - node.offsetTop - node.clientHeight) / 2 + offsetY},
-                    {x: (mouseConnectionPos[0]) + (mouseConnectionPos[0] - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: node.offsetTop + node.clientHeight + (mouseConnectionPos[1] - node.offsetTop - node.clientHeight) / 2 + offsetY},
+                    {x: (node.offsetLeft + node.clientWidth) - ((mouseConnectionPos[0] - offsetX) - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: node.offsetTop + node.clientHeight + ((mouseConnectionPos[1] - offsetY) - node.offsetTop - node.clientHeight) / 2 + offsetY},
+                    {x: (mouseConnectionPos[0]) + ((mouseConnectionPos[0] - offsetX) - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: node.offsetTop + node.clientHeight + ((mouseConnectionPos[1] - offsetY) - node.offsetTop - node.clientHeight) / 2 + offsetY},
                     {x: mouseConnectionPos[0], y: mouseConnectionPos[1]}
                 ]);
             } else {
-                /* Works when connected node's left side is to the right of the current node */
+                // Works when mouse is to the right of current node
                 curve = new bezier([
                     {x: node.offsetLeft + node.clientWidth + offsetX, y: node.offsetTop + (node.clientHeight / 2) + offsetY},
-                    {x: (node.offsetLeft + node.clientWidth) + (mouseConnectionPos[0] - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: node.offsetTop + (node.clientHeight / 2) + offsetY},
-                    {x: (node.offsetLeft + node.clientWidth) + (mouseConnectionPos[0] - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: mouseConnectionPos[1] + offsetY},
+                    {x: (node.offsetLeft + node.clientWidth) + ((mouseConnectionPos[0] - offsetX) - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: node.offsetTop + (node.clientHeight / 2) + offsetY},
+                    {x: (node.offsetLeft + node.clientWidth) + ((mouseConnectionPos[0] - offsetX) - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: (mouseConnectionPos[1] - offsetY) + offsetY},
                     {x: mouseConnectionPos[0], y: mouseConnectionPos[1]}
                 ]);
             }
