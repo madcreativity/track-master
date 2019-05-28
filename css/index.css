@@ -136,6 +136,16 @@ body {
     line-height: 25px;
 }
 
+/* Navbar shortcuts */
+#subNav-file-save::after {
+    content: "Ctrl + S";
+    color: #BCBCBC;
+    position: absolute;
+    right: 10px;
+    font-weight: 100;
+}
+
+/* Main, hidden and general page body */
 main {
     width: 100vw;
     height: 100vh;

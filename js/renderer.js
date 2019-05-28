@@ -296,10 +296,10 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if(e.target.id === "windowMaximizeBtn") {
             if(win.isMaximized()) {
                 win.restore(); // Restore
-                e.target.innerText = String.fromCodePoint(0x1F5D6);
+                e.target.innerText = String.fromCodePoint(0x1F5D6); // 'Maximize' - Unicode icon
             } else {
                 win.maximize(); // Maximize
-                e.target.innerText = String.fromCodePoint(0x1F5D7);
+                e.target.innerText = String.fromCodePoint(0x1F5D7); // 'Restore' - Unicode icon
             }
         }
     });
