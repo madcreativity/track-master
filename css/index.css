@@ -41,6 +41,8 @@ body {
     outline: none !important;
     height: 25px;
     width: 25px;
+    font-size: 16px;
+    line-height: 25px;
     transition: background-color 250ms ease, color 250ms ease;
 }
 

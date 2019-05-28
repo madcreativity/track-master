@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         thisNodeElement.setAttribute("data-node-id", thisNodeElement.getAttribute("data-node-id") - 1);
                     }
                 }
-                
+
 
                 updateCanvas();
             }
@@ -293,6 +293,14 @@ document.addEventListener('DOMContentLoaded', () => {
             win.close(); // Close
         } else if(e.target.id === "windowMinimizeBtn") {
             win.minimize(); // Minimize
+        } else if(e.target.id === "windowMaximizeBtn") {
+            if(win.isMaximized()) {
+                win.restore(); // Restore
+                e.target.innerText = String.fromCodePoint(0x1F5D6);
+            } else {
+                win.maximize(); // Maximize
+                e.target.innerText = String.fromCodePoint(0x1F5D7);
+            }
         }
     });
 
