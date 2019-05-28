@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let winLoading = remote.getGlobal('winLoading');
 
     // Editor page -- tools
-    // Hold down left mouse button on connection dot and drag to another connection dot to connect two nodes
+    // Hold down left mouse button on connection dot and drag to another connection dot to connect two nodes -- WIP
     
     let curTool = 0; // Edit, Grab
     let keyMap = {};
@@ -27,8 +27,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 curTool = 1;
                 document.body.classList.replace("tool-edit", "tool-grab");
             } else if(e.keyCode === 46 && heldNode.parentNode !== null) {
-                nodes.splice(heldNode.getAttribute("data-node-id"), 1);
+                let nodeId = heldNode.getAttribute("data-node-id");
+                
+                nodes.splice(nodeId, 1);
                 heldNode.parentNode.removeChild(heldNode);
+                
+                for(let n = 0; n < nodes.length; n++) {
+                    let thisNodePos = nodes[n].connections.indexOf(nodeId);
+
+                    if(thisNodePos !== -1) {
+                        nodes[n].connections.splice(thisNodePos, 1);
+                    }
+
+                    for(let i = 0; i < nodes[n].connections.length; i++) {
+                        if(nodes[n].connections[i] > nodeId) {
+                            nodes[n].connections[i]--;
+                        }
+                    }
+                    
+                    let thisNodeElement = DOMeditorNodeContainer.children[n];
+                    if(nodeId < thisNodeElement.getAttribute("data-node-id")) {
+                        thisNodeElement.setAttribute("data-node-id", thisNodeElement.getAttribute("data-node-id") - 1);
+                    }
+                }
+
+
+                updateCanvas();
             }
         }
 
@@ -82,6 +106,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Node functionality
+    let isMouseConnectionHeld = false;
+    let mouseConnectionNode = 0;
+    let mouseConnectionPos = [0, 0];
+    
     function NodeItem(title, content, connections, transform) {
         this.title = title;
         this.content = content;
@@ -157,6 +185,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Remove element
             singularNodeEditor.parentNode.removeChild(singularNodeEditor);
+
+
+            updateCanvas();
         });
 
         nodeEditorCancelBtnElement.addEventListener('click', (e) => {
@@ -378,17 +409,25 @@ document.addEventListener('DOMContentLoaded', () => {
                                 return;
                             }
                             
-                            let parsedData = JSON.parse(data);
+                            document.body.classList.add("loading-cursor");
+
+                            let parsedData;
+
+                            try {
+                                parsedData = JSON.parse(data);
+                            } catch(err) {
+                                console.error(err);
+                                document.body.classList.remove("loading-cursor");
+                                return;                     
+                            }
 
                             resetEditor();
-
                             filePath = file;
-
                             nodes = parsedData.nodes;
-
                             createNodes();
-                            
                             updateCanvas();
+
+                            document.body.classList.remove("loading-cursor");
                         });
                     }
                 }
@@ -463,6 +502,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     heldNode = document.querySelector(".nodeContainer.selected");
                     nodePos = [ heldNode.offsetLeft, heldNode.offsetTop ];
+                } else if(e.target.classList.contains("connectorOut")) {
+                    isMouseConnectionHeld = true;
+                    mouseConnectionNode = e.target.parentNode.getAttribute("data-node-id");
+                    mouseConnectionPos[0] = e.clientX;
+                    mouseConnectionPos[1] = e.clientY;
+
+                    updateCanvas();
                 }
             }
         }
@@ -488,37 +534,32 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('mousemove', (e) => {
         e = e || window.event;
 
-        // Draggable background - Move if left mouse button is held down
         if(isEditorPageHeld) {
-            if(curTool === 1) {
-                let relativeX, relativeY;
+            let relativeX, relativeY;
 
-                relativeX = e.clientX - editorPageHeldPos[0] + editorPos[0];
-                relativeY = e.clientY - editorPageHeldPos[1] + editorPos[1];
+            relativeX = e.clientX - editorPageHeldPos[0] + editorPos[0];
+            relativeY = e.clientY - editorPageHeldPos[1] + editorPos[1];
 
-                DOMeditorPage.style.backgroundPosition = relativeX + "px " + relativeY + "px";
-                DOMeditorNodeContainer.style.left = relativeX + "px";
-                DOMeditorNodeContainer.style.top = relativeY + "px";
+            DOMeditorPage.style.backgroundPosition = relativeX + "px " + relativeY + "px";
+            DOMeditorNodeContainer.style.left = relativeX + "px";
+            DOMeditorNodeContainer.style.top = relativeY + "px";
 
-                updateCanvas(relativeX, relativeY);
-            } else {
-                isEditorPageHeld = false;
-
-                editorPos[0] = e.clientX - editorPageHeldPos[0] + editorPos[0];
-                editorPos[1] = e.clientY - editorPageHeldPos[1] + editorPos[1];
-            }
+            updateCanvas(relativeX, relativeY);
         } else if(isNodeHeld) {
-            if(curTool === 0) {
-                let relativeX, relativeY;
+            let relativeX, relativeY;
 
-                relativeX = e.clientX - nodeHeldPos[0] + nodePos[0];
-                relativeY = e.clientY - nodeHeldPos[1] + nodePos[1];
+            relativeX = e.clientX - nodeHeldPos[0] + nodePos[0];
+            relativeY = e.clientY - nodeHeldPos[1] + nodePos[1];
 
-                heldNode.style.left = relativeX + "px";
-                heldNode.style.top = relativeY + "px";
+            heldNode.style.left = relativeX + "px";
+            heldNode.style.top = relativeY + "px";
 
-                updateCanvas();
-            }
+            updateCanvas();
+        } else if(isMouseConnectionHeld) {
+            mouseConnectionPos[0] = e.clientX;
+            mouseConnectionPos[1] = e.clientY;
+
+            updateCanvas();
         }
     });
 
@@ -526,7 +567,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('mouseup', (e) => {
         e = e || window.event;
 
-        // Draggable background
         if(isEditorPageHeld) {
             isEditorPageHeld = false;
 
@@ -538,6 +578,14 @@ document.addEventListener('DOMContentLoaded', () => {
             let nodeId = heldNode.getAttribute("data-node-id")
             nodes[nodeId].transform[0] = heldNode.offsetLeft;
             nodes[nodeId].transform[1] = heldNode.offsetTop;
+        } else if(isMouseConnectionHeld) {
+            isMouseConnectionHeld = false;
+
+            if(e.target.classList.contains("connectorIn")) {
+                nodes[mouseConnectionNode].connections.push(e.target.parentNode.getAttribute("data-node-id"));
+            }
+
+            updateCanvas();
         }
     });
     
@@ -618,6 +666,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fillRect(curve.points[2].x - 5, curve.points[2].y - 5, 10, 10);
                 ctx.fillStyle = "#707070";*/
             }
+        }
+
+        // Draw connection curve to mouse
+        if(isMouseConnectionHeld) {
+            let node = DOMeditorNodeContainer.children[mouseConnectionNode];
+            
+            let curve;
+
+            if(node.offsetLeft + node.clientWidth > mouseConnectionPos[0] - offsetX) {
+                /* Works when connected node's left side is to the left of the current node */
+                curve = new bezier([
+                    {x: node.offsetLeft + node.clientWidth + offsetX, y: node.offsetTop + (node.clientHeight / 2) + offsetY},
+                    {x: (node.offsetLeft + node.clientWidth) - (mouseConnectionPos[0] - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: node.offsetTop + node.clientHeight + (mouseConnectionPos[1] - node.offsetTop - node.clientHeight) / 2 + offsetY},
+                    {x: (mouseConnectionPos[0]) + (mouseConnectionPos[0] - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: node.offsetTop + node.clientHeight + (mouseConnectionPos[1] - node.offsetTop - node.clientHeight) / 2 + offsetY},
+                    {x: mouseConnectionPos[0], y: mouseConnectionPos[1]}
+                ]);
+            } else {
+                /* Works when connected node's left side is to the right of the current node */
+                curve = new bezier([
+                    {x: node.offsetLeft + node.clientWidth + offsetX, y: node.offsetTop + (node.clientHeight / 2) + offsetY},
+                    {x: (node.offsetLeft + node.clientWidth) + (mouseConnectionPos[0] - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: node.offsetTop + (node.clientHeight / 2) + offsetY},
+                    {x: (node.offsetLeft + node.clientWidth) + (mouseConnectionPos[0] - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: mouseConnectionPos[1] + offsetY},
+                    {x: mouseConnectionPos[0], y: mouseConnectionPos[1]}
+                ]);
+            }
+            
+            drawCurve(curve);
         }
     }
 

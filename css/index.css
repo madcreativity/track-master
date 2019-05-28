@@ -341,3 +341,8 @@ body.tool-edit #page-editor .nodeContainer:hover {
     justify-content: flex-end;
     width: 100%;
 }
+
+/* Loading cursor */
+body.loading-cursor * {
+    cursor: wait !important;
+}
