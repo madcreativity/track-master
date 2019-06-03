@@ -11,9 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let win = remote.getGlobal('win');
     let winLoading = remote.getGlobal('winLoading');
 
-    // Editor page -- tools
-    // Hold down left mouse button on connection dot and drag to another connection dot to connect two nodes -- WIP
-    
+    // Editor page -- tools    
     let curTool = 0; // Edit, Grab
     let keyMap = {};
     let DOMeditorPage = document.querySelector("#page-editor");
@@ -58,6 +56,40 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        // Move canvas with arrow keys
+        if(keyMap[37] || keyMap[38] || keyMap[39] || keyMap[40]) {
+            let relativeX, relativeY;
+
+            if(keyMap[37]) {
+                // Move canvas left
+                relativeX = editorPos[0] + 16;
+                relativeY = editorPos[1];
+            } else if(keyMap[39]) {
+                // Move canvas right
+                relativeX = editorPos[0] - 16;
+                relativeY = editorPos[1];
+            }
+
+            if(keyMap[38]) {
+                // Move canvas up
+                relativeX = editorPos[0];
+                relativeY = editorPos[1] + 16;
+            } else if(keyMap[40]) {
+                // Move canvas down
+                relativeX = editorPos[0];
+                relativeY = editorPos[1] - 16;
+            }
+
+            editorPos[0] = relativeX;
+            editorPos[1] = relativeY;
+
+            DOMeditorPage.style.backgroundPosition = relativeX + "px " + relativeY + "px";
+            DOMeditorNodeContainer.style.left = relativeX + "px";
+            DOMeditorNodeContainer.style.top = relativeY + "px";
+
+            updateCanvas();
+        }
+
         // CTRL + S to save
         if(keyMap[17] && keyMap[83]) {
             if(filePath !== "") {
@@ -81,9 +113,116 @@ document.addEventListener('DOMContentLoaded', () => {
         keyMap[e.keyCode] = e.type == 'keydown';
     });
 
+    // Right clicking editor page
+    DOMeditorPage.addEventListener('contextmenu', (e) => {
+        e = e || window.event;
+        e.preventDefault();
+
+        if(!closeSubNavs()) {
+            if(curTool === 0) {
+                // Node connector context menu
+                if(e.target.classList.contains("nodeConnector")) {
+                    // TODO:
+                    // Display connections in context menu
+                    // Add X to each connection that removes it when pressed
+                    let thisNode = nodes[parseInt(e.target.parentNode.getAttribute("data-node-id"))];
+
+                    let thisNodeType = thisNode.inConnections;
+                    if(e.target.classList.contains("connectorOut")) {
+                        thisNodeType = thisNode.connections;
+                    }
+
+                    if(thisNodeType.length > 0) {
+                        // Create elements
+                        let contextMenuElement = document.createElement("div");
+                        let contextMenuListElement = document.createElement("ul");
+
+                        // Classes and id's
+                        contextMenuElement.className = "contextMenu contextMenuPart";
+                        contextMenuListElement.className = "contextMenuPart";
+
+                        // Other attributes
+                        contextMenuElement.setAttribute("data-node-id", e.target.parentNode.getAttribute("data-node-id"));
+
+                        contextMenuElement.style.left = e.clientX + "px";
+                        contextMenuElement.style.top = e.clientY + "px";
+
+                        contextMenuElement.addEventListener('click', (e) => {
+                            e = e || window.event;
+
+                            if(e.target.classList.contains("contextMenuDeleteBtn")) {
+                                e.target.parentNode.parentNode.removeChild(e.target.parentNode);
+
+                                let thisNodeId = parseInt(e.currentTarget.getAttribute("data-node-id"));
+                                let thisConnectionIndex = -1;
+                                let thisNodeTypeString = e.target.parentNode.getAttribute("data-connection-type");
+
+                                let thisNodeType = nodes[thisNodeId].inConnections;
+                                if(thisNodeTypeString === "connectorOut") {
+                                    thisNodeType = nodes[thisNodeId].connections;
+                                } 
+
+
+                                let thisNodeElement = e.target;
+                                for (thisConnectionIndex = -1; thisNodeElement = thisNodeElement.previousSibling; thisConnectionIndex++) {}
+                                console.log(thisConnectionIndex);
+                                
+                                let thisConnectedNodeId = parseInt(thisNodeType[thisConnectionIndex]);
+
+                                // TODO: Remove node connection
+                                if(thisNodeTypeString === "connectorIn") {
+                                    nodes[thisConnectedNodeId].connections.splice(thisConnectionIndex, 1);
+                                } else {
+                                    nodes[thisConnectedNodeId].inConnections.splice(thisConnectionIndex, 1);
+                                }
+
+                                thisNodeType.splice(thisConnectionIndex, 1);
+
+
+                                if(document.querySelector(".contextMenu ul").children.length <= 0) {
+                                    document.querySelector(".contextMenu").parentNode.removeChild(document.querySelector(".contextMenu"));
+                                }
+
+                                updateCanvas();
+                            }
+                        });
+
+                        // Element structure
+                        for(let i = 0; i < thisNodeType.length; i++) {
+                            let contextMenuListItemElement = document.createElement("li");
+                            let contextMenuListItemTextElement = document.createElement("span");
+                            let contextMenuListItemDeleteElement = document.createElement("button");
+
+                            contextMenuListItemDeleteElement.className = "contextMenuDeleteBtn contextMenuPart";
+                            contextMenuListItemTextElement.className = "contextMenuPart";
+                            contextMenuListItemElement.className = "contextMenuPart";
+
+                            contextMenuListItemElement.setAttribute("data-connection-index", i);
+                            contextMenuListItemElement.setAttribute("data-connection-type", (e.target.classList.contains("connectorOut")) ? "connectorOut" : "connectorIn");
+
+                            contextMenuListItemTextElement.textContent = nodes[parseInt(thisNodeType[i])].title;
+
+                            contextMenuListItemDeleteElement.textContent = String.fromCodePoint(0x2715);
+
+                            contextMenuListItemElement.appendChild(contextMenuListItemTextElement);
+                            contextMenuListItemElement.appendChild(contextMenuListItemDeleteElement);
+                            contextMenuListElement.appendChild(contextMenuListItemElement);
+                        }
+
+                        
+
+                        contextMenuElement.appendChild(contextMenuListElement);
+                        DOMeditorPage.appendChild(contextMenuElement);
+                    }
+                }
+            }
+        }
+
+        return false;
+    });
+
     DOMeditorPage.addEventListener('click', (e) => {
         e = e || window.event;
-
         
         if(!closeSubNavs()) {
             if(curTool === 0) {
@@ -102,6 +241,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     deselectNodes();
 
                     heldNode.classList.add("selected");
+
+                    updateCanvas();
                 }
             }
         }
@@ -115,6 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function NodeItem(title, content, connections, transform) {
         this.title = title;
         this.content = content;
+        this.inConnections = [];
         this.connections = connections;
         this.transform = transform;
     }
@@ -173,6 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         nodeEditorOkBtnElement.addEventListener('click', (e) => {
             e = e || window.event;
+            e.preventDefault();
 
             // Apply changes
             let singularNodeEditor = document.querySelector(".singularNodeEditor");
@@ -194,6 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         nodeEditorCancelBtnElement.addEventListener('click', (e) => {
             e = e || window.event;
+            e.preventDefault();
 
             // Remove element
             document.querySelector(".singularNodeEditor").parentNode.removeChild(document.querySelector(".singularNodeEditor"));            
@@ -387,6 +531,8 @@ document.addEventListener('DOMContentLoaded', () => {
             while(DOMeditorNodeContainer.firstChild) {
                 DOMeditorNodeContainer.removeChild(DOMeditorNodeContainer.firstChild);
             }
+
+            updateCanvas();
         } else if(e.target.id === "subNav-edit-deselect") {
             // Deselect
             closeSubNavs();
@@ -512,6 +658,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     heldNode = document.querySelector(".nodeContainer.selected");
                     nodePos = [ heldNode.offsetLeft, heldNode.offsetTop ];
+                    
+                    updateCanvas();
                 } else if(e.target.classList.contains("connectorOut")) {
                     isMouseConnectionHeld = true;
                     mouseConnectionNode = e.target.parentNode.getAttribute("data-node-id");
@@ -537,6 +685,20 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMeditorNodeContainer.style.top = "0";
 
             updateCanvas();
+        }
+    });
+
+    // Window event -- Mouse button down
+    window.addEventListener('mousedown', (e) => {
+        e = e || window.event;
+
+        // Remove all context menus
+        let contextMenus = document.querySelectorAll(".contextMenu");
+
+        if(!e.target.classList.contains("contextMenuPart")) {
+            contextMenus.forEach((contextMenu) => {
+                contextMenu.parentNode.removeChild(contextMenu);
+            });
         }
     });
 
@@ -593,6 +755,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if(e.target.classList.contains("connectorIn")) {
                 nodes[mouseConnectionNode].connections.push(e.target.parentNode.getAttribute("data-node-id"));
+                nodes[e.target.parentNode.getAttribute("data-node-id")].inConnections.push(mouseConnectionNode);
             }
 
             updateCanvas();
@@ -603,6 +766,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let ctx = DOMnodeCanvas.getContext("2d");
 
     ctx.fillStyle = "#707070";
+    ctx.strokeStyle = "#707070";
 
     let drawCurve = (curve, offset) => {
         offset = offset || { x:0, y:0 };
@@ -666,7 +830,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     ]);
                 }
                 
+                // If curve that is about to be drawn is in some way connected with the selected node, draw it in the standard selection colour
+                /*if(heldNode.parentNode !== null) {
+                    if(nodes[parseInt(heldNode.getAttribute("data-node-id"))].inConnections.includes(i.toString())) {
+                        ctx.strokeStyle = "#0074FF";
+                        drawCurve(curve);
+                        ctx.strokeStyle = "#707070";
+                        continue;
+                    }
+                }*/
+                
                 drawCurve(curve);
+                
 
                 /* Debug curve handles */
                 /*ctx.fillStyle = "#0000EE";
@@ -689,7 +864,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 curve = new bezier([
                     {x: node.offsetLeft + node.clientWidth + offsetX, y: node.offsetTop + (node.clientHeight / 2) + offsetY},
                     {x: (node.offsetLeft + node.clientWidth) - ((mouseConnectionPos[0] - offsetX) - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: node.offsetTop + node.clientHeight + ((mouseConnectionPos[1] - offsetY) - node.offsetTop - node.clientHeight) / 2 + offsetY},
-                    {x: (mouseConnectionPos[0]) + ((mouseConnectionPos[0] - offsetX) - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: node.offsetTop + node.clientHeight + ((mouseConnectionPos[1] - offsetY) - node.offsetTop - node.clientHeight) / 2 + offsetY},
+                    {x: ((mouseConnectionPos[0] - offsetX)) + ((mouseConnectionPos[0] - offsetX) - node.offsetLeft - node.clientWidth) / 2 + offsetX, y: node.offsetTop + node.clientHeight + ((mouseConnectionPos[1] - offsetY) - node.offsetTop - node.clientHeight) / 2 + offsetY},
                     {x: mouseConnectionPos[0], y: mouseConnectionPos[1]}
                 ]);
             } else {
@@ -703,6 +878,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             drawCurve(curve);
+
+            /* Debug curve handles */
+            /*ctx.fillStyle = "#0000EE";
+            ctx.fillRect(curve.points[1].x - 5, curve.points[1].y - 5, 10, 10);
+
+            ctx.fillStyle = "#EE0000";
+            ctx.fillRect(curve.points[2].x - 5, curve.points[2].y - 5, 10, 10);
+            ctx.fillStyle = "#707070";*/
         }
     }
 

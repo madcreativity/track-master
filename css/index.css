@@ -37,18 +37,22 @@ body {
     padding: 0;
     border: 0;
     background-color: transparent;
-    color: #ECECEC;
+    color: #F9F9F9;
     outline: none !important;
     height: 25px;
     width: 25px;
     font-size: 16px;
     line-height: 25px;
-    transition: background-color 250ms ease, color 250ms ease;
 }
 
 .windowBtn:hover {
-    background-color: #ECECEC;
-    color: #7C7C7C;
+    background-color: #F9F9F9;
+    color: #707070;
+}
+
+#windowCloseBtn:hover {
+    background-color: #FF4747;
+    color: #F9F9F9;
 }
 
 .navSystem {
@@ -261,6 +265,7 @@ body.tool-edit #page-editor .nodeContainer:hover {
     height: 15px;
     position: absolute;
     box-sizing: border-box;
+    transition: width 200ms ease, height 200ms ease;
 }
 
 #page-editor .nodeConnector.connectorOut {
@@ -273,6 +278,15 @@ body.tool-edit #page-editor .nodeContainer:hover {
     top: 50%;
     left: 0;
     transform: translateX(-50%) translateY(-50%);
+}
+
+#page-editor .nodeConnector:hover {
+    width: 18px;
+    height: 18px;
+}
+
+#page-editor .selected .nodeConnector {
+    background-color: #0074FF;
 }
 
 #page-editor #editor-node-canvas {
@@ -352,6 +366,56 @@ body.tool-edit #page-editor .nodeContainer:hover {
     display: flex;
     justify-content: flex-end;
     width: 100%;
+}
+
+/* Context menu */
+.contextMenu {
+    position: fixed;
+    background-color: #F9F9F9;
+    color: #707070;
+    box-sizing: border-box;
+    padding: 0 10px;
+    box-shadow: 0 2px 6px 1px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    max-width: 500px;
+    z-index: 150;
+    border: 1px solid #707070;
+    border-radius: 4px;
+}
+
+.contextMenu:hover {
+    cursor: default;
+}
+
+.contextMenu ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.contextMenu li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.contextMenu li:not(:last-child) {
+    border-bottom: 1px solid #DCDCDC;
+}
+
+.contextMenu button {
+    border: 0;
+    background-color: transparent;
+    padding: 0;
+    color: #BCBCBC;
+    width: 25px;
+    height: 25px;
+    line-height: 25px;
+}
+
+.contextMenu button:hover {
+    cursor: pointer;
+    color: #707070;
 }
 
 /* Loading cursor */
