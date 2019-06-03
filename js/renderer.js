@@ -57,25 +57,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Move canvas with arrow keys
-        if(keyMap[37] || keyMap[38] || keyMap[39] || keyMap[40]) {
+        if(document.querySelector(".singularNodeEditor") === null && (keyMap[37] || keyMap[38] || keyMap[39] || keyMap[40])) {
+            closeSubNavs();
+            
+            // Remove all context menus
+            let contextMenus = document.querySelectorAll(".contextMenu");
+
+            if(!e.target.classList.contains("contextMenuPart")) {
+                contextMenus.forEach((contextMenu) => {
+                    contextMenu.parentNode.removeChild(contextMenu);
+                });
+            }
+
+
             let relativeX, relativeY;
 
+            // Horizontal
             if(keyMap[37]) {
-                // Move canvas left
                 relativeX = editorPos[0] + 16;
                 relativeY = editorPos[1];
             } else if(keyMap[39]) {
-                // Move canvas right
                 relativeX = editorPos[0] - 16;
                 relativeY = editorPos[1];
             }
 
+            // Vertical
             if(keyMap[38]) {
-                // Move canvas up
                 relativeX = editorPos[0];
                 relativeY = editorPos[1] + 16;
             } else if(keyMap[40]) {
-                // Move canvas down
                 relativeX = editorPos[0];
                 relativeY = editorPos[1] - 16;
             }
@@ -122,9 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if(curTool === 0) {
                 // Node connector context menu
                 if(e.target.classList.contains("nodeConnector")) {
-                    // TODO:
-                    // Display connections in context menu
-                    // Add X to each connection that removes it when pressed
                     let thisNode = nodes[parseInt(e.target.parentNode.getAttribute("data-node-id"))];
 
                     let thisNodeType = thisNode.inConnections;
@@ -154,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 e.target.parentNode.parentNode.removeChild(e.target.parentNode);
 
                                 let thisNodeId = parseInt(e.currentTarget.getAttribute("data-node-id"));
-                                let thisConnectionIndex = -1;
+                                let thisConnectionIndex = 0;
                                 let thisNodeTypeString = e.target.parentNode.getAttribute("data-connection-type");
 
                                 let thisNodeType = nodes[thisNodeId].inConnections;
@@ -163,17 +170,17 @@ document.addEventListener('DOMContentLoaded', () => {
                                 } 
 
 
-                                let thisNodeElement = e.target;
-                                for (thisConnectionIndex = -1; thisNodeElement = thisNodeElement.previousSibling; thisConnectionIndex++) {}
-                                console.log(thisConnectionIndex);
-                                
+                                let thisNodeElement = e.target.parentNode;
+                                while((thisNodeElement = thisNodeElement.previousSibling)) {
+                                    thisConnectionIndex++;
+                                }
+
                                 let thisConnectedNodeId = parseInt(thisNodeType[thisConnectionIndex]);
 
-                                // TODO: Remove node connection
                                 if(thisNodeTypeString === "connectorIn") {
-                                    nodes[thisConnectedNodeId].connections.splice(thisConnectionIndex, 1);
+                                    nodes[thisConnectedNodeId].connections.splice(nodes[thisConnectedNodeId].connections.indexOf(thisNodeId.toString()), 1);
                                 } else {
-                                    nodes[thisConnectedNodeId].inConnections.splice(thisConnectionIndex, 1);
+                                    nodes[thisConnectedNodeId].inConnections.splice(nodes[thisConnectedNodeId].inConnections.indexOf(thisNodeId.toString()), 1);
                                 }
 
                                 thisNodeType.splice(thisConnectionIndex, 1);
@@ -754,8 +761,11 @@ document.addEventListener('DOMContentLoaded', () => {
             isMouseConnectionHeld = false;
 
             if(e.target.classList.contains("connectorIn")) {
-                nodes[mouseConnectionNode].connections.push(e.target.parentNode.getAttribute("data-node-id"));
-                nodes[e.target.parentNode.getAttribute("data-node-id")].inConnections.push(mouseConnectionNode);
+                let thisParentNodeId = e.target.parentNode.getAttribute("data-node-id")
+                if(!nodes[mouseConnectionNode].connections.includes(thisParentNodeId)) {
+                    nodes[mouseConnectionNode].connections.push(thisParentNodeId);
+                    nodes[thisParentNodeId].inConnections.push(mouseConnectionNode);
+                }
             }
 
             updateCanvas();
