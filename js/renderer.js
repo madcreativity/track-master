@@ -158,8 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             e = e || window.event;
 
                             if(e.target.classList.contains("contextMenuDeleteBtn")) {
-                                e.target.parentNode.parentNode.removeChild(e.target.parentNode);
-
                                 let thisNodeId = parseInt(e.currentTarget.getAttribute("data-node-id"));
                                 let thisConnectionIndex = 0;
                                 let thisNodeTypeString = e.target.parentNode.getAttribute("data-connection-type");
@@ -176,6 +174,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                 }
 
                                 let thisConnectedNodeId = parseInt(thisNodeType[thisConnectionIndex]);
+
+                                
+                                e.target.parentNode.parentNode.removeChild(e.target.parentNode);
+
 
                                 if(thisNodeTypeString === "connectorIn") {
                                     nodes[thisConnectedNodeId].connections.splice(nodes[thisConnectedNodeId].connections.indexOf(thisNodeId.toString()), 1);
@@ -840,7 +842,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ]);
                 }
                 
-                // If curve that is about to be drawn is in some way connected with the selected node, draw it in the standard selection colour
+                // Highlight connection lines coming to and from the selected node
                 if(heldNode.parentNode !== null) {
                     if(nodes[i].connections[n] === heldNode.getAttribute("data-node-id") || parseInt(heldNode.getAttribute("data-node-id")) === i) {
                         ctx.strokeStyle = "#0074FF";
