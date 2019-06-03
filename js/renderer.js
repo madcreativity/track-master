@@ -841,27 +841,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 
                 // If curve that is about to be drawn is in some way connected with the selected node, draw it in the standard selection colour
-                /*if(heldNode.parentNode !== null) {
-                    if(nodes[parseInt(heldNode.getAttribute("data-node-id"))].inConnections.includes(i.toString())) {
+                if(heldNode.parentNode !== null) {
+                    if(nodes[i].connections[n] === heldNode.getAttribute("data-node-id") || parseInt(heldNode.getAttribute("data-node-id")) === i) {
                         ctx.strokeStyle = "#0074FF";
                         drawCurve(curve);
                         ctx.strokeStyle = "#707070";
                         continue;
                     }
-                }*/
+                }
                 
                 drawCurve(curve);
-                
-
-                /* Debug curve handles */
-                /*ctx.fillStyle = "#0000EE";
-                ctx.fillRect(curve.points[1].x - 5, curve.points[1].y - 5, 10, 10);
-
-                ctx.fillStyle = "#EE0000";
-                ctx.fillRect(curve.points[2].x - 5, curve.points[2].y - 5, 10, 10);
-                ctx.fillStyle = "#707070";*/
             }
         }
+
 
         // Draw connection curve to mouse
         if(isMouseConnectionHeld) {
@@ -887,15 +879,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 ]);
             }
             
+            ctx.strokeStyle = "#0074FF";
+
             drawCurve(curve);
-
-            /* Debug curve handles */
-            /*ctx.fillStyle = "#0000EE";
-            ctx.fillRect(curve.points[1].x - 5, curve.points[1].y - 5, 10, 10);
-
-            ctx.fillStyle = "#EE0000";
-            ctx.fillRect(curve.points[2].x - 5, curve.points[2].y - 5, 10, 10);
-            ctx.fillStyle = "#707070";*/
+            
+            ctx.strokeStyle = "#707070";
         }
     }
 
