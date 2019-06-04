@@ -56,6 +56,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        let DOMnavBtnFile = document.querySelector("#navBtn-file");
+        let DOMnavBtnEdit = document.querySelector("#navBtn-edit");
+
         // Move canvas with arrow keys
         if(document.querySelector(".singularNodeEditor") === null && (keyMap[37] || keyMap[38] || keyMap[39] || keyMap[40])) {
             closeSubNavs();
@@ -98,6 +101,25 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMeditorNodeContainer.style.top = relativeY + "px";
 
             updateCanvas();
+        }
+
+        // ALT + F -- Open "File" Menu
+        if(keyMap[18] && keyMap[70]) {
+            closeSubNavs();
+
+            DOMnavBtnFile.parentNode.querySelector(".subNav").classList.replace("hidden", "visible");
+        } 
+
+        // ALT + E -- Open "Edit" Menu
+        if(keyMap[18] && keyMap[69]) {
+            closeSubNavs();            
+            
+            DOMnavBtnEdit.parentNode.querySelector(".subNav").classList.replace("hidden", "visible");
+        }
+
+        // ALT -- Close all menus
+        if(keyMap[18] && (!keyMap[70] && !keyMap[69])) {
+            closeSubNavs();
         }
 
         // CTRL + S to save
