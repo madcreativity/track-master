@@ -7,6 +7,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const fs = require('fs');
     const bezier = require('bezier-js');
 
+    ipcRenderer.send('request-mainprocess-action', {
+        message: "error-out",
+        data: "pass a"
+    });
+
+    
     // Connect windows
     let win = remote.getGlobal('win');
     let winLoading = remote.getGlobal('winLoading');

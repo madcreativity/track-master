@@ -8,10 +8,11 @@
   },
   "devDependencies": {
     "bezier-js": "^2.4.0",
-    "electron": "^5.0.1"
+    "electron": "^5.0.1",
+    "electron-packager": "^13.1.1"
   },
   "dependencies": {
     "asar": "^2.0.1",
-    "bezier.js": "0.0.0"
+    "bezier-js": "^2.4.0"
   }
 }
