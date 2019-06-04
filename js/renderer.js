@@ -6,12 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const {ipcRenderer} = require('electron');
     const fs = require('fs');
     const bezier = require('bezier-js');
-
-    ipcRenderer.send('request-mainprocess-action', {
-        message: "error-out",
-        data: "pass a"
-    });
-
     
     // Connect windows
     let win = remote.getGlobal('win');
@@ -477,10 +471,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if(e.target.id === "windowMaximizeBtn") {
             if(win.isMaximized()) {
                 win.restore(); // Restore
-                e.target.innerText = String.fromCodePoint(0x1F5D6); // 'Maximize' - Unicode icon
             } else {
                 win.maximize(); // Maximize
-                e.target.innerText = String.fromCodePoint(0x1F5D7); // 'Restore' - Unicode icon
             }
         }
     });
@@ -918,7 +910,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     updateCanvas();
+
+    // Maximize window
+    let DOMwindowMaximizeBtn = document.querySelector("#windowMaximizeBtn");
+
     
+    win.on('unmaximize', () => {
+        DOMwindowMaximizeBtn.innerText = String.fromCodePoint(0x1F5D6); // 'Maximize' - Unicode icon
+    });
+
+    win.on('restore', () => {
+        DOMwindowMaximizeBtn.innerText = String.fromCodePoint(0x1F5D6); // 'Maximize' - Unicode icon
+    });
+
+    win.on('maximize', () => {
+        DOMwindowMaximizeBtn.innerText = String.fromCodePoint(0x1F5D7); // 'Restore' - Unicode icon
+    });
+
+
+    DOMwindowMaximizeBtn.click();
+
     // Loading completed
     ipcRenderer.send('request-mainprocess-action', {
         message: "loading-end"
