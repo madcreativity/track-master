@@ -914,7 +914,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Maximize window
     let DOMwindowMaximizeBtn = document.querySelector("#windowMaximizeBtn");
 
-    
+
+    // Switch between maximize and restore icon when maximizing, unmaximizing and restoring window
     win.on('unmaximize', () => {
         DOMwindowMaximizeBtn.innerText = String.fromCodePoint(0x1F5D6); // 'Maximize' - Unicode icon
     });
@@ -926,10 +927,7 @@ document.addEventListener('DOMContentLoaded', () => {
     win.on('maximize', () => {
         DOMwindowMaximizeBtn.innerText = String.fromCodePoint(0x1F5D7); // 'Restore' - Unicode icon
     });
-
-
-    DOMwindowMaximizeBtn.click();
-
+    
     // Loading completed
     ipcRenderer.send('request-mainprocess-action', {
         message: "loading-end"
