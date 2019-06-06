@@ -16,6 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let keyMap = {};
     let DOMeditorPage = document.querySelector("#page-editor");
 
+    let DOMnavBtnFile = document.querySelector("#navBtn-file");
+    let DOMnavBtnEdit = document.querySelector("#navBtn-edit");
+
     window.addEventListener('keydown', (e) => {
         e = e || window.event;
         keyMap[e.keyCode] = e.type == 'keydown';        
@@ -26,24 +29,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.body.classList.replace("tool-edit", "tool-grab");
             } else if(e.keyCode === 46 && heldNode.parentNode !== null) {
                 let nodeId = heldNode.getAttribute("data-node-id");
+
                 
+                // Remove all connections to nodes
+                // InConnections
+                let thisNodeInConnections = nodes[parseInt(nodeId)].inConnections;
+                for(let i = 0; i < thisNodeInConnections.length; i++) {
+                    let thisNodeId = thisNodeInConnections[i];
+                    
+                    nodes[parseInt(thisNodeId)].connections.splice(nodes[parseInt(thisNodeId)].connections.indexOf(nodeId), 1);
+                }
+
+                // Connections
+                let thisNodeConnections = nodes[parseInt(nodeId)].connections;
+                for(let i = 0; i < thisNodeConnections.length; i++) {
+                    let thisNodeId = thisNodeConnections[i];
+                    
+                    nodes[parseInt(thisNodeId)].inConnections.splice(nodes[parseInt(thisNodeId)].inConnections.indexOf(nodeId), 1);
+                }
+
+
                 // Remove node element
                 nodes.splice(nodeId, 1);
                 heldNode.parentNode.removeChild(heldNode);
-                
-                // Remove all connections to nodes
+
+
                 for(let n = 0; n < nodes.length; n++) {
-                    let thisNodePos = nodes[n].connections.indexOf(nodeId);
-                    
-                    if(thisNodePos !== -1) {
-                        nodes[n].connections.splice(thisNodePos, 1);
+                    let thisNodesFound;
+                    let thisUsedIndices = [];
+
+                    // Connections
+                    while((thisNodesFound = nodes[n].connections.findIndex((id, index) => (parseInt(id) > parseInt(nodeId) && !thisUsedIndices.includes(index)))) !== -1) {
+                        nodes[n].connections[thisNodesFound] = (parseInt(nodes[n].connections[thisNodesFound]) - 1).toString();
+                        thisUsedIndices.push(thisNodesFound);
                     }
 
-                    for(let i = 0; i < nodes[n].connections.length; i++) {
-                        if(nodes[n].connections[i] > nodeId) {
-                            nodes[n].connections[i] = (parseInt(nodes[n].connections[i]) - 1).toString();
-                        }
+                    // InConnections
+                    thisUsedIndices = [];
+                    while((thisNodesFound = nodes[n].inConnections.findIndex((id, index) => (parseInt(id) > parseInt(nodeId) && !thisUsedIndices.includes(index)))) !== -1) {
+                        nodes[n].inConnections[thisNodesFound] = (parseInt(nodes[n].inConnections[thisNodesFound]) - 1).toString();
+                        thisUsedIndices.push(thisNodesFound);
                     }
+
                     
                     let thisNodeElement = DOMeditorNodeContainer.children[n];
                     if(thisNodeElement.getAttribute("data-node-id") > nodeId) {
@@ -55,9 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateCanvas();
             }
         }
-
-        let DOMnavBtnFile = document.querySelector("#navBtn-file");
-        let DOMnavBtnEdit = document.querySelector("#navBtn-edit");
 
         // Move canvas with arrow keys
         if(document.querySelector(".singularNodeEditor") === null && (keyMap[37] || keyMap[38] || keyMap[39] || keyMap[40])) {
@@ -73,23 +97,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
 
-            let relativeX, relativeY;
+            let relativeX = editorPos[0];
+            let relativeY = editorPos[1];
 
             // Horizontal
             if(keyMap[37]) {
                 relativeX = editorPos[0] + 16;
-                relativeY = editorPos[1];
             } else if(keyMap[39]) {
                 relativeX = editorPos[0] - 16;
-                relativeY = editorPos[1];
             }
 
             // Vertical
             if(keyMap[38]) {
-                relativeX = editorPos[0];
                 relativeY = editorPos[1] + 16;
             } else if(keyMap[40]) {
-                relativeX = editorPos[0];
                 relativeY = editorPos[1] - 16;
             }
 
@@ -129,6 +150,12 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 fileSaveAs();
             }
+        }
+
+
+        // ALT + D -- Debug
+        if(keyMap[18] && keyMap[68]) {
+            console.log(nodes);
         }
     });
 
@@ -208,6 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 }
 
                                 thisNodeType.splice(thisConnectionIndex, 1);
+                                
 
 
                                 if(document.querySelector(".contextMenu ul").children.length <= 0) {
@@ -258,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(!closeSubNavs()) {
             if(curTool === 0) {
                 if(e.target === DOMnodeCanvas) {
-                    let nodeObj = new NodeItem("Title here", "Content here", [], [
+                    let nodeObj = new NodeItem("Title here", "Description here", [], [
                         e.clientX - editorPos[0],
                         e.clientY - editorPos[1],
                         300
@@ -927,7 +955,7 @@ document.addEventListener('DOMContentLoaded', () => {
     win.on('maximize', () => {
         DOMwindowMaximizeBtn.innerText = String.fromCodePoint(0x1F5D7); // 'Restore' - Unicode icon
     });
-    
+
     // Loading completed
     ipcRenderer.send('request-mainprocess-action', {
         message: "loading-end"

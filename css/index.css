@@ -11,13 +11,13 @@ body {
     position: fixed;
     top: 0;
     left: 0;
-    background-color: #7C7C7C;
+    background-color: #0074FF;
     width: 100vw;
     z-index: 100;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.25);
+    /*box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.25);*/
     -webkit-user-select: none;
     -webkit-app-region: drag;
 }
@@ -47,7 +47,7 @@ body {
 
 .windowBtn:hover {
     background-color: #F9F9F9;
-    color: #707070;
+    color: #0074FF;
 }
 
 #windowCloseBtn:hover {
@@ -101,13 +101,13 @@ body {
     position: absolute;
     left: 0;
     top: 100%;
-    background-color: #7C7C7C;
+    background-color: #0074FF;
     margin: 0;
     list-style: none;
     width: 200px;
     box-sizing: border-box;
     padding: 0;
-    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.25);
+    /*box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.25);*/
 }
 
 .subNavOuterBtn::before {
@@ -141,14 +141,14 @@ body {
     left: 50%;
     transform: translateX(-50%);
     margin: 0;
-    color: #BCBCBC;
+    color: #F9F9F9;
     line-height: 25px;
 }
 
 /* Navbar shortcuts */
 #subNav-file-save::after {
     content: "Ctrl + S";
-    color: #BCBCBC;
+    color: #DCDCDC;
     position: absolute;
     right: 10px;
     font-weight: 100;

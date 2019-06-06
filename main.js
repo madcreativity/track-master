@@ -67,15 +67,12 @@ var createMainWindow = () => {
 }
 
 ipcMain.on('request-mainprocess-action', (event, arg) => {
-    if(arg.message === "loading-update") {
-        // TODO: Improve functionality
-        //winLoading.webContents.executeJavaScript('document.querySelector("h2").textContent = "' + arg.data + '";');
-    } else if(arg.message === "loading-end") {
+    if(arg.message === "loading-end") {
         isLoading = false;
         winLoading.close();
         win.show();
     } else if(arg.message === "error-out") {
-        winLoading.webContents.executeJavaScript('console.log("' + arg.data + '");');
+        winLoading.webContents.executeJavaScript('console.error("' + arg.data + '");');
     }
 });
 
