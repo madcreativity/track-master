@@ -29,7 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.body.classList.replace("tool-edit", "tool-grab");
             } else if(e.keyCode === 46 && heldNode.parentNode !== null) {
                 let nodeId = heldNode.getAttribute("data-node-id");
-
                 
                 // Remove all connections to nodes
                 // InConnections
@@ -48,11 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     nodes[parseInt(thisNodeId)].inConnections.splice(nodes[parseInt(thisNodeId)].inConnections.indexOf(nodeId), 1);
                 }
 
-
                 // Remove node element
                 nodes.splice(nodeId, 1);
                 heldNode.parentNode.removeChild(heldNode);
-
 
                 for(let n = 0; n < nodes.length; n++) {
                     let thisNodesFound;
@@ -70,7 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         nodes[n].inConnections[thisNodesFound] = (parseInt(nodes[n].inConnections[thisNodesFound]) - 1).toString();
                         thisUsedIndices.push(thisNodesFound);
                     }
-
                     
                     let thisNodeElement = DOMeditorNodeContainer.children[n];
                     if(thisNodeElement.getAttribute("data-node-id") > nodeId) {
@@ -151,7 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 fileSaveAs();
             }
         }
-
 
         // ALT + D -- Debug
         if(keyMap[18] && keyMap[68]) {
@@ -324,10 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
         this.nodes = nodeJSON;
     }
     
-    let nodes = [
-        
-    ];
-
+    let nodes = [];
 
     let deselectNodes = () => {
         // Deselect all other selected elements
@@ -939,7 +931,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateCanvas();
 
-    // Maximize window
+    // Maximize window button
     let DOMwindowMaximizeBtn = document.querySelector("#windowMaximizeBtn");
 
 
